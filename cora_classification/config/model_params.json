@@ -1,0 +1,11 @@
+{
+    "hidden_features": 1433,
+    "num_gnn_layers": 5,
+    "num_mlp_layers": 3,
+    "learning_rate": 0.001,
+    "weight_decay": 0,
+    "num_epochs": 100,
+    "batch_size": 128,
+    "num_classes": 7,
+    "num_nodes": 2708
+}

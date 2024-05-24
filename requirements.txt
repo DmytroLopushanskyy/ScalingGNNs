@@ -1,0 +1,8 @@
+pandas
+torch
+jupyter
+kuzu
+torch
+torch_geometric
+torch_sparse
+neo4j

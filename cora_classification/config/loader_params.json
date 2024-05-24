@@ -1,0 +1,6 @@
+{
+    "num_neighbors": [10, 10],
+    "batch_size": 16,
+    "num_workers": 0,
+    "filter_per_worker": false
+}
