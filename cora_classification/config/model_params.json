@@ -4,7 +4,7 @@
     "num_mlp_layers": 3,
     "learning_rate": 0.001,
     "weight_decay": 0,
-    "num_epochs": 100,
+    "num_epochs": 20,
     "batch_size": 128,
     "num_classes": 7,
     "num_nodes": 2708
