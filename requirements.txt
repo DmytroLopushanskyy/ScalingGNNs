@@ -1,9 +1,8 @@
 pandas
-torch
 jupyter
-kuzu
+kuzu==0.4.2
 torch==2.3.0
-torch_geometric
+torch_geometric==2.5.3
 torch_scatter==2.1.2
 torch_sparse==0.6.18
 pyg-lib==0.4.0
