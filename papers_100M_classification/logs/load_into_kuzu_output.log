@@ -1,0 +1,68 @@
+Creating Kùzu database...
+Database creation completed in 0:00:00.111774
+Creating Kùzu tables...
+Table creation completed in 0:00:00.632591
+No existing 'cites' table found: Binder exception: Table cites does not exist.
+Relationship table creation completed in 0:00:00.038727
+Copying nodes to Kùzu tables...
+Nodes copied in 0:03:36.151994
+Copying edges to Kùzu tables from split files...
+file_path data/papers100M/edge_idx_split/split_aa.csv start_time 2024-06-21 23:05:52.434916
+Copied data/papers100M/edge_idx_split/split_aa.csv in 0:00:16.646663
+file_path data/papers100M/edge_idx_split/split_ab.csv start_time 2024-06-21 23:06:12.596370
+Copied data/papers100M/edge_idx_split/split_ab.csv in 0:06:39.262808
+file_path data/papers100M/edge_idx_split/split_ac.csv start_time 2024-06-21 23:12:53.993591
+Copied data/papers100M/edge_idx_split/split_ac.csv in 0:01:40.340194
+file_path data/papers100M/edge_idx_split/split_ad.csv start_time 2024-06-21 23:14:35.974283
+Copied data/papers100M/edge_idx_split/split_ad.csv in 0:01:29.469897
+file_path data/papers100M/edge_idx_split/split_ae.csv start_time 2024-06-21 23:16:07.149114
+Copied data/papers100M/edge_idx_split/split_ae.csv in 0:02:33.217496
+file_path data/papers100M/edge_idx_split/split_af.csv start_time 2024-06-21 23:18:42.405761
+Copied data/papers100M/edge_idx_split/split_af.csv in 0:07:18.286662
+file_path data/papers100M/edge_idx_split/split_ag.csv start_time 2024-06-21 23:26:03.038327
+Copied data/papers100M/edge_idx_split/split_ag.csv in 0:07:10.910934
+file_path data/papers100M/edge_idx_split/split_ah.csv start_time 2024-06-21 23:33:16.756871
+Copied data/papers100M/edge_idx_split/split_ah.csv in 0:09:55.156208
+file_path data/papers100M/edge_idx_split/split_ai.csv start_time 2024-06-21 23:43:15.133004
+Copied data/papers100M/edge_idx_split/split_ai.csv in 0:09:09.872810
+file_path data/papers100M/edge_idx_split/split_aj.csv start_time 2024-06-21 23:52:27.797064
+Copied data/papers100M/edge_idx_split/split_aj.csv in 0:11:01.422128
+file_path data/papers100M/edge_idx_split/split_ak.csv start_time 2024-06-22 00:03:32.744791
+Copied data/papers100M/edge_idx_split/split_ak.csv in 0:09:19.624916
+file_path data/papers100M/edge_idx_split/split_al.csv start_time 2024-06-22 00:12:55.545833
+Copied data/papers100M/edge_idx_split/split_al.csv in 0:20:24.176987
+file_path data/papers100M/edge_idx_split/split_am.csv start_time 2024-06-22 00:33:23.581570
+Copied data/papers100M/edge_idx_split/split_am.csv in 0:23:39.279316
+file_path data/papers100M/edge_idx_split/split_an.csv start_time 2024-06-22 00:57:06.989211
+Copied data/papers100M/edge_idx_split/split_an.csv in 0:24:08.689060
+file_path data/papers100M/edge_idx_split/split_ao.csv start_time 2024-06-22 01:21:19.859087
+Copied data/papers100M/edge_idx_split/split_ao.csv in 0:21:32.081841
+file_path data/papers100M/edge_idx_split/split_ap.csv start_time 2024-06-22 01:42:56.057056
+Copied data/papers100M/edge_idx_split/split_ap.csv in 0:22:06.304051
+file_path data/papers100M/edge_idx_split/split_aq.csv start_time 2024-06-22 02:05:06.521916
+Copied data/papers100M/edge_idx_split/split_aq.csv in 0:27:06.185301
+file_path data/papers100M/edge_idx_split/split_ar.csv start_time 2024-06-22 02:32:17.306640
+Copied data/papers100M/edge_idx_split/split_ar.csv in 0:24:06.176763
+file_path data/papers100M/edge_idx_split/split_as.csv start_time 2024-06-22 02:56:28.720152
+Copied data/papers100M/edge_idx_split/split_as.csv in 0:30:16.238985
+file_path data/papers100M/edge_idx_split/split_at.csv start_time 2024-06-22 03:26:49.754513
+Copied data/papers100M/edge_idx_split/split_at.csv in 0:28:59.214312
+file_path data/papers100M/edge_idx_split/split_au.csv start_time 2024-06-22 03:55:53.889569
+Copied data/papers100M/edge_idx_split/split_au.csv in 0:39:28.601285
+file_path data/papers100M/edge_idx_split/split_av.csv start_time 2024-06-22 04:35:32.297705
+Copied data/papers100M/edge_idx_split/split_av.csv in 0:24:14.726543
+file_path data/papers100M/edge_idx_split/split_aw.csv start_time 2024-06-22 04:59:51.859580
+Copied data/papers100M/edge_idx_split/split_aw.csv in 0:31:31.745984
+file_path data/papers100M/edge_idx_split/split_ax.csv start_time 2024-06-22 05:31:28.858636
+Copied data/papers100M/edge_idx_split/split_ax.csv in 0:27:20.283693
+file_path data/papers100M/edge_idx_split/split_ay.csv start_time 2024-06-22 05:58:54.636102
+Copied data/papers100M/edge_idx_split/split_ay.csv in 0:24:07.476180
+file_path data/papers100M/edge_idx_split/split_az.csv start_time 2024-06-22 06:23:07.148692
+Copied data/papers100M/edge_idx_split/split_az.csv in 0:23:12.450447
+file_path data/papers100M/edge_idx_split/split_ba.csv start_time 2024-06-22 06:46:24.666291
+Copied data/papers100M/edge_idx_split/split_ba.csv in 0:23:39.487460
+file_path data/papers100M/edge_idx_split/split_bb.csv start_time 2024-06-22 07:10:09.212552
+Copied data/papers100M/edge_idx_split/split_bb.csv in 0:06:25.101985
+file_path data/papers100M/edge_idx_split/split_0.csv start_time 2024-06-22 07:16:37.763510
+Copied data/papers100M/edge_idx_split/split_0.csv in 0:00:01.718220
+All done!

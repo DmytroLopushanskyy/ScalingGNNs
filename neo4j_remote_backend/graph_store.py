@@ -6,14 +6,23 @@ import torch
 from torch_geometric.typing import EdgeTensorType, EdgeType, OptTensor
 from torch_geometric.data.graph_store import EdgeAttr, EdgeLayout, GraphStore
 from neo4j_remote_backend.client import Neo4jClient
+from torch_geometric.typing import EdgeTensorType, EdgeType, OptTensor
+from torch_geometric.data.graph_store import EdgeAttr, EdgeLayout, GraphStore
+from neo4j_remote_backend.client import Neo4jClient
 
 
 class Neo4jGraphStore(GraphStore):
     def __init__(self, client: Neo4jClient | None = None, num_threads: int | None = None):
         print("Neo4jGraphStore __init__", num_threads)
+    def __init__(self, client: Neo4jClient | None = None, num_threads: int | None = None):
+        print("Neo4jGraphStore __init__", num_threads)
         super().__init__()
         if num_threads is None:
             num_threads = multiprocessing.cpu_count()
+        if client is None:
+            client = Neo4jClient(num_threads)
+
+        self.__client = client
         if client is None:
             client = Neo4jClient(num_threads)
 

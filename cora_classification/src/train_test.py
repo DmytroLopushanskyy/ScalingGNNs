@@ -1,4 +1,5 @@
 import time
+import time
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -10,6 +11,7 @@ torch.set_printoptions(threshold=torch.inf)
 
 def test(model, test_loader, mode='no-backend'):
     start_time = time.time()
+    start_time = time.time()
     model.eval()
     correct = 0
     total = 0
@@ -20,6 +22,9 @@ def test(model, test_loader, mode='no-backend'):
                 # print(batch['paper'].x.shape, batch[('paper', 'cites', 'paper')].edge_index.shape)
                 test_logits = model(batch['paper'].x, batch[('paper', 'cites', 'paper')].edge_index)
                 test_labels = batch['paper'].y
+            elif mode == 'neo4j':
+                test_logits = model(batch['Paper'].features, batch[('Paper', 'CITES', 'Paper')].edge_index)
+                test_labels = batch['Paper'].label
             elif mode == 'neo4j':
                 test_logits = model(batch['Paper'].features, batch[('Paper', 'CITES', 'Paper')].edge_index)
                 test_labels = batch['Paper'].label
@@ -36,15 +41,20 @@ def test(model, test_loader, mode='no-backend'):
                 total += batch.size()[0]
             elif mode == 'neo4j':
                 total += batch.size()[0]
+            elif mode == 'neo4j':
+                total += batch.size()[0]
             else:
                 total += batch.test_mask.sum().item()
 
     test_accuracy = correct / total
     print(f"Test duration: {time.time() - start_time:.2f} seconds")
     print(f"Test accuracy: {test_accuracy}")
+    print(f"Test duration: {time.time() - start_time:.2f} seconds")
+    print(f"Test accuracy: {test_accuracy}")
 
 
 def train(model, train_loader, test_loader, params, mode='no-backend'):
+    start_time = time.time()
     start_time = time.time()
     model.train()
     loss_fn = nn.CrossEntropyLoss()
@@ -55,7 +65,10 @@ def train(model, train_loader, test_loader, params, mode='no-backend'):
 
     for epoch in range(params["num_epochs"]):
         print("#"*40 + f" Epoch {epoch}")
+        print("#"*40 + f" Epoch {epoch}")
         total_loss = 0
+        for batch_num, batch in enumerate(train_loader):
+            # print("#" * 20 + f" Batch {batch_num}")
         for batch_num, batch in enumerate(train_loader):
             # print("#" * 20 + f" Batch {batch_num}")
             batch = batch.to(device)  # Ensure batch is on the correct device
@@ -96,6 +109,7 @@ def train(model, train_loader, test_loader, params, mode='no-backend'):
             optimizer.step()
             total_loss += loss.item() * batch.num_nodes
             # print(f"Loss {loss.item()}")
+            # print(f"Loss {loss.item()}")
 
         avg_loss = total_loss / len(train_loader.dataset)
         losses.append(avg_loss)
@@ -107,6 +121,14 @@ def train(model, train_loader, test_loader, params, mode='no-backend'):
         #     print(f'Epoch [{epoch+1}/{params["num_epochs"]}] - Loss: {avg_loss:.4f}, '
         #           f'Test Accuracy: {test_accuracy:.4f}')
         #     model.train()
+        # if epoch % 8 == 0:
+        #     test_accuracy = test(model, test_loader, mode)
+        #     test_accuracies.append(test_accuracy)
+        #
+        #     print(f'Epoch [{epoch+1}/{params["num_epochs"]}] - Loss: {avg_loss:.4f}, '
+        #           f'Test Accuracy: {test_accuracy:.4f}')
+        #     model.train()
 
+    print(f"Train duration: {time.time() - start_time:.2f} seconds")
     print(f"Train duration: {time.time() - start_time:.2f} seconds")
     return losses, test_accuracies

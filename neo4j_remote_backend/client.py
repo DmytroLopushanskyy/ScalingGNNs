@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 import torch
-from torch import Tensor
 import numpy as np
-from typing import Tuple
 from neo4j import GraphDatabase
 from torch_geometric.data.feature_store import TensorAttr
 from torch_geometric.data.graph_store import EdgeAttr, EdgeLayout, GraphStore
-from torch_geometric.typing import FeatureTensorType, EdgeType
+from torch_geometric.typing import FeatureTensorType
 
 
 class Neo4jClient:
@@ -16,7 +14,6 @@ class Neo4jClient:
         user = "neo4j"
         password = "12345678"
         self.__driver = GraphDatabase.driver(uri, auth=(user, password))
-        self.count = 0
 
     def get_node_groups_and_features(self):
         with self.__driver.session() as session:
@@ -90,8 +87,7 @@ class Neo4jClient:
             raise ValueError(msg)
 
         query = f"{match_clause} {where_clause} {return_clause}"
-        self.count += 1
-        # print("count", self.count)
+        # print("query", query)
         with self.__driver.session() as session:
             result = session.run(query)
             result_list = list()
@@ -105,21 +101,6 @@ class Neo4jClient:
         # print("result_list", len(result_list))
 
         return torch.tensor(result_list)
-
-    def query_db_for_one_hop_neighbors(self, seed_nodes: Tensor, edge_type: EdgeType) -> Tuple[Tensor, Tensor]:
-        src_nodes = []
-        dst_nodes = []
-        with self.__driver.session() as session:
-            for seed_node in seed_nodes.tolist():
-                result = session.run(
-                    f"MATCH (src:{edge_type[0]})-[r:{edge_type[1]}]->(dst:{edge_type[2]}) "
-                    f"WHERE id(src) = $seed_node "
-                    f"RETURN id(src) as src, id(dst) as dst",
-                    seed_node=seed_node)
-                for record in result:
-                    src_nodes.append(record["src"])
-                    dst_nodes.append(record["dst"])
-        return torch.tensor(src_nodes), torch.tensor(dst_nodes)
 
     def get_all_edges(self, edge_attr: EdgeAttr):
         with self.__driver.session() as session:
@@ -138,4 +119,3 @@ class Neo4jClient:
             edge_array = np.array(edges).T  # Transpose to get 2 rows and #of_edges columns
             edge_tensor = torch.tensor(edge_array, dtype=torch.long)
             return edge_tensor
-        # return []
