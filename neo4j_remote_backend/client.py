@@ -12,7 +12,7 @@ class Neo4jClient:
     def __init__(self, num_threads: int = 0):
         uri = "bolt://localhost:7687"
         user = "neo4j"
-        password = "12345678"
+        password = "password"
         self.__driver = GraphDatabase.driver(uri, auth=(user, password))
 
     def get_node_groups_and_features(self):

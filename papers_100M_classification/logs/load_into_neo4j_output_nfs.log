@@ -1,0 +1,180 @@
+Neo4j version: 5.21.0
+Importing the contents of these files into /data/coml-intersection-joins/kebl7757/neo4j-community-5.21.0/data/databases/papers100m:
+Nodes:
+  [PAPER]:
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_header.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_0.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_1.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_2.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_3.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_4.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_5.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_6.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_7.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_8.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_9.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_10.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_11.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_12.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_13.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_14.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_15.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_16.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_17.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_18.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_19.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_20.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_21.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_22.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_23.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_24.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_25.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_26.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_27.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_28.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_29.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_30.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_31.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_32.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_33.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_34.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_35.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_36.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_37.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_38.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_39.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_40.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_41.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_42.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_43.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_44.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_45.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_46.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_47.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_48.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_49.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_50.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_51.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_52.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_53.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_54.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_55.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_56.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_57.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_58.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_59.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_60.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_61.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_62.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_63.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_64.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_65.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_66.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_67.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_68.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_69.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_70.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_71.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_72.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_73.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_74.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_75.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_76.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_77.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_78.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_79.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_80.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_81.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_82.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_83.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_84.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_85.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_86.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_87.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_88.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_89.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_90.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_91.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_92.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_93.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_94.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_95.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_96.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_97.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_98.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_99.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_100.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_101.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_102.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_103.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_104.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_105.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_106.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_107.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_108.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_109.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_110.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/nodes_split/nodes_chunk_111.csv
+
+Relationships:
+  CITES:
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/_edge_header.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_0.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_aa.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ab.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ac.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ad.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ae.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_af.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ag.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ah.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ai.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_aj.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ak.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_al.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_am.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_an.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ao.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ap.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_aq.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ar.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_as.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_at.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_au.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_av.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_aw.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ax.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ay.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_az.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_ba.csv
+  /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/edge_idx_split/split_bb.csv
+
+
+Available resources:
+  Total machine memory: 128.0GiB
+  Free machine memory: 127.4GiB
+  Max heap memory : 26.67GiB
+  Max worker threads: 32
+  Configured max memory: 90.90GiB
+  High parallel IO: true
+
+
+Import starting 2024-07-04 12:13:36.629+0100
+  Estimated number of nodes: 111.06 M
+  Estimated number of node properties: 334.74 M
+  Estimated number of relationships: 1.63 G
+  Estimated number of relationship properties: 0.00 
+  Estimated disk space usage: 193.9GiB
+  Estimated required memory usage: 2.475GiB
+
+(1/4) Node import 2024-07-04 12:13:36.637+0100
+  Estimated number of nodes: 111.06 M
+  Estimated disk space usage: 142.4GiB
+  Estimated required memory usage: 2.475GiB
+.......... .......... .......... .......... ..........   5% ∆6m 38s 491ms [6m 38s 491ms]
+.......... .......... .......... .......... ..........  10% ∆14m 363ms [20m 38s 854ms]
+.......... .......... .......... .......... ..........  15% ∆16m 56s 963ms [37m 35s 818ms]
+.......... .......... .......... .......... ..........  20% ∆23m 1s 136ms [1h 36s 954ms]
+.......... .......... .......... .......... ..........  25% ∆30m 5s 348ms [1h 30m 42s 302ms]
+.......... .......... .......... .......... ..........  30% ∆1h 19m 11s 267ms [2h 49m 53s 570ms]
+.......... .......... .......... > 7 hours total at this point. Quit.

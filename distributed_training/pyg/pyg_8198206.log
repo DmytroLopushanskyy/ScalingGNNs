@@ -1,0 +1,147 @@
+--- Distributed training example on OGB ---
+* total nodes: 2
+* node rank: 0
+* dataset: ogbn-products
+* dataset root dir: ./data/partitions/ogbn-products/2-parts
+* epochs: 100
+* batch size: 1024
+* number of sampler workers: 4
+* master addr: 10.137.60.94
+* training process group master port: 11111
+* training loader master port: 11112
+* testing loader master port: 11113
+* RPC asynchronous processing: True
+* RPC concurrency: 4
+* loader multithreading: 10
+* logging enabled: False
+* progress bars enabled: False
+--- Launching training processes ...
+--- Distributed training example on OGB ---
+* total nodes: 2
+* node rank: 0
+* dataset: ogbn-products
+* dataset root dir: ./data/partitions/ogbn-products/2-parts
+* epochs: 100
+* batch size: 1024
+* number of sampler workers: 4
+* master addr: 10.137.60.94
+* training process group master port: 11111
+* training loader master port: 11112
+* testing loader master port: 11113
+* RPC asynchronous processing: True
+* RPC concurrency: 4
+* loader multithreading: 10
+* logging enabled: False
+* progress bars enabled: False
+--- Launching training processes ...
+--- Distributed training example on OGB ---
+* total nodes: 2
+* node rank: 0
+* dataset: ogbn-products
+* dataset root dir: ./data/partitions/ogbn-products/2-parts
+* epochs: 100
+* batch size: 1024
+* number of sampler workers: 4
+* master addr: 10.137.60.94
+* training process group master port: 11111
+* training loader master port: 11112
+* testing loader master port: 11113
+* RPC asynchronous processing: True
+* RPC concurrency: 4
+* loader multithreading: 10
+* logging enabled: False
+* progress bars enabled: False
+--- Launching training processes ...
+--- Distributed training example on OGB ---
+* total nodes: 2
+* node rank: 0
+* dataset: ogbn-products
+* dataset root dir: ./data/partitions/ogbn-products/2-parts
+* epochs: 100
+* batch size: 1024
+* number of sampler workers: 4
+* master addr: 10.137.60.94
+* training process group master port: 11111
+* training loader master port: 11112
+* testing loader master port: 11113
+* RPC asynchronous processing: True
+* RPC concurrency: 4
+* loader multithreading: 10
+* logging enabled: False
+* progress bars enabled: False
+--- Launching training processes ...
+[W socket.cpp:464] [c10d] The server socket has failed to bind to [::]:11111 (errno: 98 - Address already in use).
+[W socket.cpp:464] [c10d] The server socket has failed to bind to 0.0.0.0:11111 (errno: 98 - Address already in use).
+[E socket.cpp:500] [c10d] The server socket has failed to listen on any local network address.
+--- Loading data partition files ...
+Partition metadata: {'num_parts': 2, 'node_types': None, 'edge_types': None, 'node_offset': None, 'is_hetero': False, 'is_sorted': True}
+--- Initialize DDP training group ...
+Traceback (most recent call last):
+  File "/data/coml-intersection-joins/kebl7757/ScalingGNNs/distributed_training/pyg/node_ogb_cpu.py", line 448, in <module>
+    torch.multiprocessing.spawn(
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 281, in spawn
+    return start_processes(fn, args, nprocs, join, daemon, start_method="spawn")
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 237, in start_processes
+    while not context.join():
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 188, in join
+    raise ProcessRaisedException(msg, error_index, failed_process.pid)
+torch.multiprocessing.spawn.ProcessRaisedException: 
+
+-- Process 0 terminated with the following error:
+Traceback (most recent call last):
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 75, in _wrap
+    fn(i, *args)
+  File "/data/coml-intersection-joins/kebl7757/ScalingGNNs/distributed_training/pyg/node_ogb_cpu.py", line 225, in run_proc
+    torch.distributed.init_process_group(
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/c10d_logger.py", line 75, in wrapper
+    return func(*args, **kwargs)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/c10d_logger.py", line 89, in wrapper
+    func_return = func(*args, **kwargs)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/distributed_c10d.py", line 1305, in init_process_group
+    store, rank, world_size = next(rendezvous_iterator)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/rendezvous.py", line 199, in _tcp_rendezvous_handler
+    store = _create_c10d_store(result.hostname, result.port, rank, world_size, timeout, use_libuv)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/rendezvous.py", line 174, in _create_c10d_store
+    return TCPStore(
+torch.distributed.DistNetworkError: The server socket has failed to listen on any local network address. The server socket has failed to bind to [::]:11111 (errno: 98 - Address already in use). The server socket has failed to bind to 0.0.0.0:11111 (errno: 98 - Address already in use).
+
+srun: error: arc-c094: task 0: Exited with exit code 1
+[W socket.cpp:464] [c10d] The server socket has failed to bind to [::]:11111 (errno: 98 - Address already in use).
+[W socket.cpp:464] [c10d] The server socket has failed to bind to 0.0.0.0:11111 (errno: 98 - Address already in use).
+[E socket.cpp:500] [c10d] The server socket has failed to listen on any local network address.
+--- Loading data partition files ...
+Partition metadata: {'num_parts': 2, 'node_types': None, 'edge_types': None, 'node_offset': None, 'is_hetero': False, 'is_sorted': True}
+--- Initialize DDP training group ...
+Traceback (most recent call last):
+  File "/data/coml-intersection-joins/kebl7757/ScalingGNNs/distributed_training/pyg/node_ogb_cpu.py", line 448, in <module>
+    torch.multiprocessing.spawn(
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 281, in spawn
+    return start_processes(fn, args, nprocs, join, daemon, start_method="spawn")
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 237, in start_processes
+    while not context.join():
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 188, in join
+    raise ProcessRaisedException(msg, error_index, failed_process.pid)
+torch.multiprocessing.spawn.ProcessRaisedException: 
+
+-- Process 0 terminated with the following error:
+Traceback (most recent call last):
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 75, in _wrap
+    fn(i, *args)
+  File "/data/coml-intersection-joins/kebl7757/ScalingGNNs/distributed_training/pyg/node_ogb_cpu.py", line 225, in run_proc
+    torch.distributed.init_process_group(
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/c10d_logger.py", line 75, in wrapper
+    return func(*args, **kwargs)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/c10d_logger.py", line 89, in wrapper
+    func_return = func(*args, **kwargs)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/distributed_c10d.py", line 1305, in init_process_group
+    store, rank, world_size = next(rendezvous_iterator)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/rendezvous.py", line 199, in _tcp_rendezvous_handler
+    store = _create_c10d_store(result.hostname, result.port, rank, world_size, timeout, use_libuv)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/rendezvous.py", line 174, in _create_c10d_store
+    return TCPStore(
+torch.distributed.DistNetworkError: The server socket has failed to listen on any local network address. The server socket has failed to bind to [::]:11111 (errno: 98 - Address already in use). The server socket has failed to bind to 0.0.0.0:11111 (errno: 98 - Address already in use).
+
+srun: error: arc-c095: task 3: Exited with exit code 1
+slurmstepd: error: *** JOB 8198206 ON arc-c094 CANCELLED AT 2024-07-05T01:54:41 ***
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** STEP 8198206.1 ON arc-c094 CANCELLED AT 2024-07-05T01:54:41 ***

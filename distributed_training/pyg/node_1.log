@@ -1,0 +1,95 @@
+nohup: ignoring input
+--- Distributed training example on OGB ---
+* total nodes: 2
+* node rank: 1
+* dataset: ogbn-products
+* dataset root dir: ./data/partitions/ogbn-products/2-parts
+* epochs: 100
+* batch size: 1024
+* number of sampler workers: 4
+* master addr: localhost
+* training process group master port: 11111
+* training loader master port: 11112
+* testing loader master port: 11113
+* RPC asynchronous processing: True
+* RPC concurrency: 4
+* loader multithreading: 10
+* logging enabled: False
+* progress bars enabled: False
+--- Launching training processes ...
+--- Loading data partition files ...
+Partition metadata: {'num_parts': 2, 'node_types': None, 'edge_types': None, 'node_offset': None, 'is_hetero': False, 'is_sorted': True}
+--- Initialize DDP training group ...
+--- Initialize distributed loaders ...
+--- Initialize model ...
+--- Start training for 100 epochs ...
+Train epoch 1/100:
+/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/distributed_c10d.py:658: UserWarning: You are using a Backend <class 'torch.distributed.distributed_c10d.ProcessGroupGloo'> as a ProcessGroup. This usage is deprecated since PyTorch 2.0. Please use a public API of PyTorch Distributed instead.
+  warnings.warn(
+/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/distributed_c10d.py:658: UserWarning: You are using a Backend <class 'torch.distributed.distributed_c10d.ProcessGroupGloo'> as a ProcessGroup. This usage is deprecated since PyTorch 2.0. Please use a public API of PyTorch Distributed instead.
+  warnings.warn(
+/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/distributed_c10d.py:658: UserWarning: You are using a Backend <class 'torch.distributed.distributed_c10d.ProcessGroupGloo'> as a ProcessGroup. This usage is deprecated since PyTorch 2.0. Please use a public API of PyTorch Distributed instead.
+  warnings.warn(
+/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/distributed_c10d.py:658: UserWarning: You are using a Backend <class 'torch.distributed.distributed_c10d.ProcessGroupGloo'> as a ProcessGroup. This usage is deprecated since PyTorch 2.0. Please use a public API of PyTorch Distributed instead.
+  warnings.warn(
+Traceback (most recent call last):
+  File "/data/coml-intersection-joins/kebl7757/ScalingGNNs/distributed_training/pyg/node_ogb_cpu.py", line 448, in <module>
+    torch.multiprocessing.spawn(
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 281, in spawn
+    return start_processes(fn, args, nprocs, join, daemon, start_method="spawn")
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 237, in start_processes
+    while not context.join():
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 188, in join
+    raise ProcessRaisedException(msg, error_index, failed_process.pid)
+torch.multiprocessing.spawn.ProcessRaisedException: 
+
+-- Process 0 terminated with the following error:
+Traceback (most recent call last):
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 75, in _wrap
+    fn(i, *args)
+  File "/data/coml-intersection-joins/kebl7757/ScalingGNNs/distributed_training/pyg/node_ogb_cpu.py", line 294, in run_proc
+    train(
+  File "/data/coml-intersection-joins/kebl7757/ScalingGNNs/distributed_training/pyg/node_ogb_cpu.py", line 128, in train
+    for i, batch in enumerate(loader):
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch_geometric/loader/base.py", line 39, in __next__
+    return self.transform_fn(next(self.iterator))
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 631, in __next__
+    data = self._next_data()
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1346, in _next_data
+    return self._process_data(data)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1372, in _process_data
+    data.reraise()
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/_utils.py", line 705, in reraise
+    raise exception
+RuntimeError: Caught RuntimeError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch_geometric/distributed/dist_loader.py", line 124, in worker_init_fn
+    init_rpc(
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch_geometric/distributed/rpc.py", line 71, in init_rpc
+    rpc.init_rpc(
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/rpc/__init__.py", line 200, in init_rpc
+    _init_rpc_backend(backend, store, name, rank, world_size, rpc_backend_options)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/rpc/__init__.py", line 233, in _init_rpc_backend
+    rpc_agent = backend_registry.init_backend(
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/rpc/backend_registry.py", line 104, in init_backend
+    return backend.value.init_backend_handler(*args, **kwargs)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/rpc/backend_registry.py", line 353, in _tensorpipe_init_backend_handler
+    api._init_rpc_states(agent)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/distributed/rpc/api.py", line 119, in _init_rpc_states
+    _set_and_start_rpc_agent(agent)
+RuntimeError: In operator() at tensorpipe/common/ibv.h:172 "": Function not implemented
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch/utils/data/_utils/worker.py", line 250, in _worker_loop
+    init_fn(worker_id)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch_geometric/loader/mixin.py", line 114, in _mt_init_fn
+    self._old_worker_init_fn(worker_id)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch_geometric/loader/mixin.py", line 75, in __call__
+    self.func(worker_id)
+  File "/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch_geometric/distributed/dist_loader.py", line 142, in worker_init_fn
+    raise RuntimeError(f"`{self}.init_fn()` could not initialize the "
+RuntimeError: `DistNeighborLoader(pid=2902229).init_fn()` could not initialize the worker loop of the neighbor sampler
+
+

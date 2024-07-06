@@ -1,0 +1,10 @@
+wikikg90m-v2/meta.pt
+wikikg90m-v2/processed/relation_feat.npy
+wikikg90m-v2/processed/entity_feat.npy
+wikikg90m-v2/processed/test-challenge_hr.npy
+wikikg90m-v2/processed/val_t.npy
+wikikg90m-v2/processed/val_hr.npy
+wikikg90m-v2/processed/test-dev_hr.npy
+wikikg90m-v2/processed/train_hrt.npy
+wikikg90m-v2/RELEASE_v1.txt
+
