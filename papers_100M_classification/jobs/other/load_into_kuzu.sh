@@ -13,4 +13,4 @@ source /home/kebl7757/miniconda3/etc/profile.d/conda.sh
 conda activate thesis
 
 # Run the Python script
-python ../loaders/load_cora_into_kuzu.py
+python ../loaders/load_into_kuzu.py

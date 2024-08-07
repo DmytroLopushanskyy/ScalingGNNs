@@ -38,6 +38,8 @@ class GraphSampler:
         num_sampled_nodes_per_hop_dict = None
         num_sampled_edges_per_hop_dict = None
 
+        # raise ValueError()
+
         sampled_nodes_dict = dict()
         mapper_dict = defaultdict(lambda: defaultdict(lambda: -1))
         slice_dict = {}
@@ -94,13 +96,15 @@ class GraphSampler:
         if directed:
             for edge_type in edge_types:
                 rel_type = f"{edge_type[0]}__{edge_type[1]}__{edge_type[2]}"
+                src_node_type = edge_type[0] if not csc else edge_type[2]
+                dst_node_type = edge_type[2] if not csc else edge_type[0]
                 rows, cols, edges = [], [], []
 
                 for i, src_node in enumerate(
                         sampled_nodes_dict[edge_type[0]] if not csc else sampled_nodes_dict[edge_type[2]]):
                     src_node = int(src_node.item())  # get item from tensor
 
-                    results = self._get_edges_from_db(driver, src_node, edge_type[1], node_time_dict, directed)
+                    results = self._get_edges_from_db(driver, src_node, src_node_type, dst_node_type, edge_type[1], node_time_dict, directed)
                     for neighbor, edge_id in results:
                         if neighbor in mapper_dict[edge_type[2] if not csc else edge_type[0]]:
                             rows.append(i)
@@ -113,7 +117,7 @@ class GraphSampler:
                 if return_edge_id:
                     out_edge_id_dict[rel_type] = torch.tensor(edges, dtype=torch.int64)
 
-        # print("nodes sampled:", len(out_node_id_dict['Paper']))
+        print("nodes sampled:", len(out_node_id_dict['PAPER']))
         return (
             out_row_dict, out_col_dict, out_node_id_dict,
             out_edge_id_dict, num_sampled_nodes_per_hop_dict, num_sampled_edges_per_hop_dict
@@ -124,11 +128,13 @@ class GraphSampler:
             node_time_dict, edge_time_dict, temporal_strategy, replace, directed,
             disjoint, edge_weight_dict, rel_type
     ):
+        # print("sample!")
         # Form the base query
         query = f"""
                 MATCH (src:{src_node_type})-[rel:{rel_type}]->(dst:{dst_node_type})
-                WHERE src.ID IN $node_ids
+                WHERE src.id IN $node_ids AND dst.label IS NOT NULL
                 """
+        node_ids = [str(x) for x in node_ids]
         parameters = {"node_ids": node_ids, "num_samples": num_samples}
 
         # Add temporal constraints if necessary
@@ -143,7 +149,7 @@ class GraphSampler:
             parameters["edge_timestamp"] = max(edge_time_dict[rel_type].values())
 
         # Randomly sample neighbors with or without replacement
-        query += " RETURN dst.ID, rand() as r"
+        query += " RETURN dst.id, rand() as r"
         if edge_weight_dict and rel_type in edge_weight_dict:
             print("edge_weight_dict and rel_type in edge_weight_dict")
             query += ", rel.weight as weight"
@@ -152,21 +158,23 @@ class GraphSampler:
 
         result = self._run_query(driver, query, parameters)
         # print(result)
-        return [record["dst.ID"] for record in result]
+        return [record["dst.id"] for record in result]
 
-    def _get_edges_from_db(self, driver, src_node_id, rel_type, node_time_dict, directed):
+    def _get_edges_from_db(self, driver, src_node_id, src_node_type, dst_node_type, rel_type, node_time_dict, directed):
+        # print("get edges!")
         query = f"""
-                MATCH (src)-[rel:{rel_type}]->(dst)
-                WHERE src.ID = $src_node_id
+                MATCH (src:{src_node_type})-[rel:{rel_type}]->(dst:{dst_node_type})
+                WHERE src.id = $src_node_id AND dst.label IS NOT NULL
                 """
 
-        parameters = {"src_node_id": src_node_id}
+        parameters = {"src_node_id": str(src_node_id)}
 
         # Add temporal constraints if necessary
         if node_time_dict:
             query += " AND dst.timestamp <= $timestamp"
             parameters["timestamp"] = max(node_time_dict.values())
 
-        query += " RETURN dst.ID, rel.ID"
+        query += " RETURN dst.id, rel.id"
+        # print("query", query, parameters)
         result = self._run_query(driver, query, parameters)
-        return [(record["dst.ID"], record["rel.ID"]) for record in result]
+        return [(record["dst.id"], record["rel.id"]) for record in result]

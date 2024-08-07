@@ -4,7 +4,7 @@ import pandas as pd
 from neo4j import GraphDatabase
 
 # Load dataset
-cora = Planetoid(root='./cora/data', name='Cora')[0]
+cora = Planetoid(root='./data', name='Cora')[0]
 
 # Save node features, labels, and IDs
 node_features = cora.x.numpy()
@@ -13,7 +13,7 @@ ids = np.arange(cora.x.shape[0])
 edges = cora.edge_index.t().numpy()
 
 # Write node CSV for Neo4j
-with open('../../cora/data/nodes.csv', 'w') as f:
+with open('./data/nodes.csv', 'w') as f:
     f.write('id,label,features\n')
     for idx, (features, label) in enumerate(zip(node_features, node_labels)):
         # Convert features array to a string
@@ -21,7 +21,7 @@ with open('../../cora/data/nodes.csv', 'w') as f:
         f.write(f"{idx},{label},{features_str}\n")
 
 # Write edge CSV for Neo4j
-with open('../../cora/data/edges.csv', 'w') as f:
+with open('./data/edges.csv', 'w') as f:
     f.write('source,target\n')
     for source, target in edges:
         f.write(f"{source},{target}\n")
@@ -29,7 +29,7 @@ with open('../../cora/data/edges.csv', 'w') as f:
 # Initialize Neo4j connection
 uri = "bolt://localhost:7687"
 user = "neo4j"
-password = "12345678"
+password = "password"
 driver = GraphDatabase.driver(uri, auth=(user, password))
 
 def clear_database(tx):
@@ -67,8 +67,8 @@ def batch_process(dataframe, func):
 with driver.session() as session:
     session.execute_write(clear_database)
 
-node_list = pd.read_csv("../../cora/data/nodes.csv")
-edge_list = pd.read_csv("../../cora/data/edges.csv")
+node_list = pd.read_csv("./data/nodes.csv")
+edge_list = pd.read_csv("./data/edges.csv")
 
 batch_process(node_list, load_nodes)
 batch_process(edge_list, load_edges)

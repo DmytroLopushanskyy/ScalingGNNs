@@ -2,10 +2,10 @@
     "hidden_features": 128,
     "num_gnn_layers": 5,
     "num_mlp_layers": 3,
-    "learning_rate": 0.001,
-    "weight_decay": 0,
-    "num_epochs": 1,
-    "batch_size": 1024,
+    "learning_rate": 0.01,
+    "weight_decay": 5e-4,
+    "num_epochs": 50,
+    "batch_size": 1152,
     "num_classes": 172,
-    "num_nodes": 111059956
+    "num_nodes": 1207179
 }

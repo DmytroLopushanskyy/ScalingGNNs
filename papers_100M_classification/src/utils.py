@@ -34,5 +34,5 @@ def get_loader_params():
 
 
 model_params = get_model_params()
-loader_params = get_loader_params()
+# loader_params = get_loader_params()
 train_mask, test_mask = train_test_split(model_params["num_nodes"])

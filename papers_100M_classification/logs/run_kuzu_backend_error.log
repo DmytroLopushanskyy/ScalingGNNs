@@ -1,1 +1,0 @@
-/var/spool/slurmd/job8138673/slurm_script: line 16: 397647 Segmentation fault      (core dumped) python kuzu_backend.py

@@ -30,8 +30,8 @@ class CLS(torch.nn.Module):
 class CoraNodeClassification(torch.nn.Module):
     def __init__(self):
         super(CoraNodeClassification, self).__init__()
-        self.crd = CRD(1433, 16, 0.5)
-        self.cls = CLS(16, 7)
+        self.crd = CRD(128, 16, 0.5)
+        self.cls = CLS(16, 172)
 
     def forward(self, x, edge_index):
         x = self.crd(x, edge_index)

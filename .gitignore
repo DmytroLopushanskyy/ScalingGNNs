@@ -1,6 +1,8 @@
 **/data/**
+**/dataset/**
 **/.DS_Store
 **/.idea/**
 **/__pycache__/**
 pyg-lib/**
 **/import.report
+**/*.log

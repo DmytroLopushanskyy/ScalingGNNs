@@ -77,6 +77,12 @@ You should change the `master_addr` to the IP of `node#0`.
 Make sure that the correct `node_rank` is provided, with the master node assigned to rank `0`.
 The `dataset_root_dir` should point to the head directory where your partition is placed, *i.e.* `../../data/partitions/ogbn-products/2-parts`:
 
+```
+export MASTER_ADDR=127.0.0.1
+export TP_SOCKET_IFNAME=lo
+export GLOO_SOCKET_IFNAME=lo
+```
+
 ```bash
 # Node 0:
 nohup python node_ogb_cpu.py \
@@ -84,7 +90,7 @@ nohup python node_ogb_cpu.py \
   --dataset_root_dir=./data/partitions/ogbn-products/2-parts \
   --num_nodes=2 \
   --node_rank=0 \
-  --master_addr=localhost > node_0.log 2>&1 &
+  --master_addr=$MASTER_ADDR > logs/node_0.log 2>&1 &
 
 # Node 1:
 nohup python node_ogb_cpu.py \
@@ -92,7 +98,7 @@ nohup python node_ogb_cpu.py \
   --dataset_root_dir=./data/partitions/ogbn-products/2-parts \
   --num_nodes=2 \
   --node_rank=1 \
-  --master_addr=localhost > node_1.log 2>&1 &
+  --master_addr=$MASTER_ADDR > logs/node_1.log 2>&1 &
 ```
 
 In some configurations, the network interface used for multi-node communication may be different than the default one.

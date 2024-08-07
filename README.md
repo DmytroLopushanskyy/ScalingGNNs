@@ -45,3 +45,10 @@ conda install -c conda-forge cmake
 conda install -c conda-forge gcc=9 gxx=9
 pip install git+https://github.com/pyg-team/pyg-lib.git@0.4.0
 ```
+
+### Custom sampler
+
+Change file located at
+```
+/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch_geometric/sampler/neighbor_sampler.py
+```
