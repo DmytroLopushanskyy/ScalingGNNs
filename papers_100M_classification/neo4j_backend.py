@@ -13,6 +13,7 @@ from src.train_test import train, test
 from neo4j_remote_backend.client import Neo4jClient
 from neo4j_remote_backend.feature_store import Neo4jFeatureStore
 from neo4j_remote_backend.graph_store import Neo4jGraphStore
+from src.graph_sampler import GraphSampler
 
 import pandas as pd
 
@@ -21,7 +22,8 @@ torch.manual_seed(12345)
 
 def main():
     db = Neo4jClient()
-    feature_store = Neo4jFeatureStore(db)
+    sampler = GraphSampler()
+    feature_store = Neo4jFeatureStore(db, sampler)
     graph_store = Neo4jGraphStore(db)
 
     train_path = "/data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/dataset/ogbn_papers100M/split/time/train.csv.gz"
@@ -35,9 +37,9 @@ def main():
     test_nodes = test_idx.tolist()
 
     loader_params = {
-        "num_neighbors": [12,12],
+        "num_neighbors": [2],
         "batch_size": 1024,
-        "num_workers": 1,
+        "num_workers": 0,
         "filter_per_worker": False
     }
 
