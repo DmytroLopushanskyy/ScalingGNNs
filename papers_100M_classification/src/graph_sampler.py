@@ -18,6 +18,7 @@ class GraphSampler:
     def __init__(self):
         self.node_features = dict()
         self.node_labels = dict()
+        self.node_ids = dict()
         self.empty_label = -9223372036854775808
 
     def _run_query(self, driver, query, parameters=None):
@@ -80,7 +81,7 @@ class GraphSampler:
         num_hops = max(len(neighbors) for neighbors in num_neighbors_dict.values())
         # Dict to keep track of seed nodes for each hop
         seeds_per_hop = {0: {node_type: seed.clone().detach().tolist() for node_type, seed in seed_dict.items()}}
-
+        
         for hop in range(num_hops):
             for edge_type in edge_types:
                 src_type, rel_name, dst_type = edge_type if not csc else (edge_type[2], edge_type[1], edge_type[0])
@@ -104,16 +105,17 @@ class GraphSampler:
                 seed_labels = list()
                 for batch_start in range(0, len(current_src_nodes), batch_size):
                     batch_node_ids = current_src_nodes[batch_start:batch_start + batch_size]
-                    results, src_features, src_labels = self._sample_neighbors_from_db(
+                    batch_node_ids = [str(x) for x in batch_node_ids]  # Convert to string for the DB
+                    results = self._sample_neighbors_from_db(
                         driver,
                         batch_node_ids, src_type, dst_type, num_neighbors,
                         node_time_dict, edge_time_dict, temporal_strategy,
                         replace, directed, disjoint, edge_weight_dict, rel_name, csc, hop
                     )
-                    if src_features.numel() > 0:  # Save features if not empty
+                    if hop == 0:
+                        src_features, src_labels = self.get_src_attributes(driver, batch_node_ids, src_type)
                         print("feat", src_features.shape)
                         seed_features.append(src_features)
-                    if src_labels.numel() > 0:  # Save labels if not empty
                         seed_labels.append(src_labels)
                         
                     for src_id, dst_id, dst_features, dst_labels, rel_id in results:
@@ -149,7 +151,7 @@ class GraphSampler:
                 if seed_features:
                     seed_features = torch.cat(seed_features, dim=0)
                     node_features[src_type] = torch.cat((node_features.get(src_type, torch.tensor([], dtype=torch.float32)), seed_features))
-                    print("#"*20, "src added", len(node_features[src_type]))
+                    # print("#"*20, "src added", len(node_features[src_type]))
                 if seed_labels:
                     seed_labels = torch.cat(seed_labels, dim=0)
                     node_labels[src_type] = torch.cat((node_labels.get(src_type, torch.tensor([], dtype=torch.float32)), seed_labels))
@@ -162,8 +164,9 @@ class GraphSampler:
                     
                     start_index = node_id_dict[dst_type].size(0)
                     node_id_dict[dst_type] = torch.cat((node_id_dict[dst_type], new_node_tensor))
+                    # print("SHAPE", node_features[dst_type].shape, new_features_tensor.shape)
                     node_features[dst_type] = torch.cat((node_features[dst_type], new_features_tensor))
-                    print("#"*20,"new_features_tensor added", len(new_features_tensor))
+                    # print("#"*20,"new_features_tensor added", len(new_features_tensor))
                     node_labels[dst_type] = torch.cat((node_labels[dst_type], new_labels_tensor))
 
                     # Update node_id_to_index with new nodes
@@ -195,21 +198,18 @@ class GraphSampler:
                 self.node_features[node_type] = dict()
             if node_type not in self.node_labels:
                 self.node_labels[node_type] = dict()
+            if node_type not in self.node_ids:
+                self.node_ids[node_type] = dict()
 
             self.node_features[node_type][hashed_indices] = node_features[node_type]
             self.node_labels[node_type][hashed_indices] = node_labels[node_type]
+            self.node_ids[node_type][hashed_indices] = node_id_dict[node_type]
 
         # print("Edge sources:", edge_source_dict)
         # print("Edge targets:", edge_target_dict)
-        print("node_id_dict:", len(node_id_dict['PAPER']))
-        print("node_features", len(self.node_features['PAPER'][hashed_indices]))
-        print("node_labels", len(self.node_labels['PAPER'][hashed_indices]))
-
-        node_type = "PAPER"
-        print("before", len(self.node_features[node_type][hashed_indices]))
-        print("before", len(self.node_labels[node_type][hashed_indices]))
-
-        # raise ValueError()
+        # print("node_id_dict:", len(node_id_dict['PAPER']))
+        # print("node_features", len(self.node_features['PAPER'][hashed_indices]))
+        # print("node_labels", len(self.node_labels['PAPER'][hashed_indices]))
 
         return (
             edge_source_dict, edge_target_dict, node_id_dict,
@@ -242,49 +242,48 @@ class GraphSampler:
             if edge_time_dict and rel_type in edge_time_dict:
                 query += f" AND rel.timestamp <= {src_node}.timestamp"
 
-        query += "RETURN"
-        if hop == 0: query += f" {src_node}, "
-        else:        query += f" {src_node}.id, "
-        query += f"{dst_node}, rel.id LIMIT $num_samples;"
-        
-        node_ids = [str(x) for x in node_ids]
-        parameters = {"node_ids": node_ids, "num_samples": num_samples * len(node_ids)}  # this means we can sample more than 12 per node but on avg no more than 12 per node
+        query += f"RETURN {src_node}.id, {dst_node}, rel.id LIMIT $num_samples;"
 
+        parameters = {"node_ids": node_ids, "num_samples": num_samples * len(node_ids)}  # this means we can sample more than X per node but on avg no more than X per node
         query_response = self._run_query(driver, query, parameters)
         print("result len", len(query_response))
 
         results = list()
-        src_features_dict = dict()
-        src_labels_dict = dict()
         for record in query_response:
-            if hop == 0:
-                feature_vector = record[f"{src_node}"]["features"]
-                if isinstance(feature_vector, str) and ';' in feature_vector:
-                    feature_vector = [float(x) for x in feature_vector.split(';')]
-                src_features_dict[record[f"{src_node}"]["id"]] = feature_vector
-                src_labels_dict[record[f"{src_node}"]["id"]] = int(record[f"{src_node}"]["label"])
-            
             dst_feature_vector = record[f"{dst_node}"]["features"]
             if isinstance(dst_feature_vector, str) and ';' in dst_feature_vector:
                 dst_feature_vector = [float(x) for x in dst_feature_vector.split(';')]
 
             results.append((
-                int(record[f"{src_node}"]["id"]),  # src_id
+                int(record[f"{src_node}.id"]),  # src_id
                 int(record[f"{dst_node}"]["id"]),  # dst_id
                 dst_feature_vector,  # dst_features
                 int(record[f"{dst_node}"]["label"]) if record[f"{dst_node}"]["label"] is not None else self.empty_label,
                 int(record["rel.id"]) if record["rel.id"] is not None else 0  # rel_id
             ))
 
+        return results
+
+    def get_src_attributes(self, driver, node_ids, src_type):
+        query = f"MATCH (node:{src_type}) WHERE node.id IN $node_ids RETURN node"
+        query_response = self._run_query(driver, query, {"node_ids": node_ids})
+
+        src_features_dict = dict()
+        src_labels_dict = dict()
+        for record in query_response:
+            feature_vector = record['node']['features']
+            if isinstance(feature_vector, str) and ';' in feature_vector:
+                feature_vector = [float(x) for x in feature_vector.split(';')]
+            src_features_dict[record['node']["id"]] = feature_vector
+            src_labels_dict[record['node']["id"]] = int(record['node']["label"])
+
         src_features_sorted = list()
         src_labels_sorted = list()
-        if hop == 0:
-            for seed_id in node_ids:
-                print(src_features_dict.get(seed_id, torch.nan))
-                src_features_sorted.append(src_features_dict.get(seed_id, torch.nan))
-                src_labels_sorted.append(src_labels_dict.get(seed_id, self.empty_label))
+        for seed_id in node_ids:
+            src_features_sorted.append(src_features_dict.get(seed_id, torch.nan))
+            src_labels_sorted.append(src_labels_dict.get(seed_id, self.empty_label))
 
-        return results, torch.tensor(src_features_sorted, dtype=torch.float32), torch.tensor(src_labels_sorted, dtype=torch.int64)
+        return torch.tensor(src_features_sorted, dtype=torch.float32), torch.tensor(src_labels_sorted, dtype=torch.int64)
 
     def get_tensor(self, attr: TensorAttr) -> Union[FeatureTensorType, None]:
         table_name = attr.group_name
@@ -297,8 +296,13 @@ class GraphSampler:
         hashed_indices = hash_tensor(indices)
 
         node_type = "PAPER"
-        print(len(self.node_features[node_type][hashed_indices]))
-        print(len(self.node_labels[node_type][hashed_indices]))
+
+        if attr_name == 'features':
+            return self.node_features[node_type][hashed_indices]
+        elif attr_name == 'label':
+            return self.node_labels[node_type][hashed_indices]
+        elif attr_name == 'id':
+            return self.node_ids[node_type][hashed_indices]
 
         raise ValueError()
 
