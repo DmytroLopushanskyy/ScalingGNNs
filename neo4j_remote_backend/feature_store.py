@@ -8,21 +8,21 @@ from torch_geometric.typing import FeatureTensorType
 from torch_geometric.data.feature_store import TensorAttr, FeatureStore
 from neo4j_remote_backend.client import Neo4jClient
 
-from src.graph_sampler import sampler
+from src.graph_sampler import GraphSampler
 
 
 class Neo4jFeatureStore(FeatureStore):
-    def __init__(self, client: Neo4jClient | None = None, num_threads: int | None = None):
-        print("Neo4jFeatureStore __init__", num_threads)
+    def __init__(self, client: Neo4jClient | None = None, sampler: GraphSampler = None, num_threads: int | None = None):
         super().__init__()
         if num_threads is None:
             num_threads = multiprocessing.cpu_count()
         if client is None:
             client = Neo4jClient(num_threads)
 
-        self.__client = client
+        self.client = client
         self.num_threads = num_threads
         self.sampler = sampler
+        print(f"Neo4jFeatureStore has GraphSampler id: {id(sampler)}")
 
     def _put_tensor(self, tensor: FeatureTensorType, attr: TensorAttr) -> bool:
         print("_put_tensor")
@@ -49,4 +49,4 @@ class Neo4jFeatureStore(FeatureStore):
         # [TensorAttr(group_name='paper', attr_name='id', index=<_FieldStatus.UNSET: None>), TensorAttr(group_name='paper', attr_name='x', index=<_FieldStatus.UNSET: None>), TensorAttr(group_name='paper', attr_name='y', index=<_FieldStatus.UNSET: None>)]
         # print('get_all_tensor_attrs', self.__client.get_node_groups_and_features())
         # return [TensorAttr('paper', 'id', None), TensorAttr('paper', 'x', None), TensorAttr('paper', 'y', None)]
-        return self.__client.get_node_groups_and_features()
+        return self.client.get_node_groups_and_features()
