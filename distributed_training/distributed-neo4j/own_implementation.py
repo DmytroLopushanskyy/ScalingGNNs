@@ -20,6 +20,12 @@ from torch_geometric.loader import NeighborLoader
 
 from multiprocessing import cpu_count
 
+# Custom Imports
+from src.client import Neo4jClient
+from src.feature_store import Neo4jFeatureStore
+from src.graph_store import Neo4jGraphStore
+from src.graph_sampler import GraphSampler
+
 
 @torch.no_grad()
 def test(
@@ -184,8 +190,6 @@ def run_proc(
     is_hetero = dataset == 'ogbn-mag'
 
     print('--- Loading data indices ...')
-    ## THESE NEED TO BE DIVIDED BASED ON # OF NODES
-    ## OR JUST KEPT THE SAME FOR NOW
     root_dir = osp.join(osp.dirname(osp.realpath(__file__)), dataset_root_dir)
     node_label_file = osp.join(root_dir, f'{dataset}-label', 'label.pt')
     train_idx = torch.load(
@@ -205,8 +209,10 @@ def run_proc(
         train_idx = ('paper', train_idx)
         test_idx = ('paper', test_idx)
 
-    db = kuzu.Database('data/kuzu-4')
-    feature_store, graph_store = db.get_torch_geometric_remote_backend(cpu_count())
+    db = Neo4jClient()
+    sampler = GraphSampler()
+    feature_store = Neo4jFeatureStore(db, sampler)
+    graph_store = Neo4jGraphStore(db)
 
     # Initialize distributed context:
     current_ctx = DistContext(
@@ -234,7 +240,7 @@ def run_proc(
         input_nodes=train_idx,
         num_neighbors=num_neighbors,
         batch_size=batch_size,
-        num_workers=num_workers,
+        num_workers=0,  # ignore num_workers
         filter_per_worker=False
     )
     # Create neighbor loader for testing:
@@ -243,7 +249,7 @@ def run_proc(
         input_nodes=test_idx,
         num_neighbors=num_neighbors,
         batch_size=batch_size,
-        num_workers=num_workers,
+        num_workers=0,  # ignore num_workers
         filter_per_worker=False
     )
 
@@ -356,7 +362,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--num_loader_threads',
         type=int,
-        default=10,
+        default=8,  # Change to 8 from 10
         help='Number of threads used for each sampler sub-process',
     )
     parser.add_argument(

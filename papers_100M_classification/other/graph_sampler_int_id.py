@@ -45,7 +45,7 @@ class GraphSampler:
             disjoint: bool = False,
             temporal_strategy: str = '',
             return_edge_id: bool = False,
-            batch_size: int = 4096
+            batch_size: int = 1024
     ) -> Tuple[Dict[str, torch.Tensor], Dict[str, torch.Tensor], Dict[str, torch.Tensor], Optional[Dict[str, torch.Tensor]], Dict[str, List[int]], Dict[str, List[int]]]:
         print("starting sampling")
         # Initialize dictionaries to store the output data
@@ -60,7 +60,7 @@ class GraphSampler:
 
         # Mapping from database node IDs to indices in node_id_dict
         node_id_to_index = {
-            node_type: {str(node_id.item()): idx for idx, node_id in enumerate(seeds)}
+            node_type: {node_id.item(): idx for idx, node_id in enumerate(seeds)}
             for node_type, seeds in seed_dict.items()
         }
 
@@ -100,10 +100,10 @@ class GraphSampler:
             seed_labels = list()
             for batch_start in range(0, len(seed_nodes), batch_size):
                 batch_node_ids = seed_nodes[batch_start:batch_start + batch_size]
-                batch_node_ids = [str(x.item()) for x in batch_node_ids]  # Convert to string for the DB
+                # batch_node_ids = [str(x.item()) for x in batch_node_ids]  # Convert to string for the DB
 
                 src_var = src_type.lower()
-                query = f"MATCH ({src_var}:{src_type}) \nWHERE {src_var}.id IN {batch_node_ids} \nWITH {src_var} "
+                query = f"MATCH ({src_var}:{src_type}) \nWHERE {src_var}.id_int IN {batch_node_ids.tolist()} \nWITH {src_var} "
                 alias = f"{src_var}"
                 neo4j_vars = list()
                 hop_nodes_limit = 0
@@ -122,9 +122,8 @@ class GraphSampler:
                         query += f"\nWITH {src_var}, {joined_neo4j_vars} "
                     query += f"\nORDER BY rand() "
                     query += f"\nWITH {src_var}, {joined_neo4j_vars} LIMIT {hop_nodes_limit} "
-                query += f" \nRETURN {src_var}.id, " + ", ".join([f"{alias}.id, {alias}.label, {alias}.features" for alias in neo4j_vars]) + ";"
+                query += f" \nRETURN {src_var}.id_int, " + ", ".join([f"{alias}.id_int, {alias}.label, {alias}.features" for alias in neo4j_vars]) + ";"
 
-                # print("query", query)
                 query_response = self._run_query(driver, query)
 
                 src_features, src_labels = self.get_src_attributes(driver, batch_node_ids, src_type)
@@ -133,9 +132,9 @@ class GraphSampler:
                 seed_labels.append(src_labels)
                     
                 for record in query_response:
-                    src_id = record.get(f"{src_var}.id")
+                    src_id = record.get(f"{src_var}.id_int")
                     for hop_node in neo4j_vars:
-                        dst_id = record.get(f"{hop_node}.id")
+                        dst_id = record.get(f"{hop_node}.id_int")
                         if dst_id is None:
                             continue
                         dst_label = record.get(f"{hop_node}.label")
@@ -147,11 +146,10 @@ class GraphSampler:
                     
                         # Handle new nodes
                         if dst_index is None:
-                            dst_id = int(dst_id)
                             if dst_id in new_nodes:
                                 dst_index = len(node_id_dict[dst_type]) + new_nodes.index(dst_id) 
                             else:
-                                new_nodes.append(dst_id)
+                                new_nodes.append(int(dst_id))
                                 if isinstance(dst_features, str) and ';' in dst_features:
                                     dst_features = [float(x) for x in dst_features.split(';')]
                                 new_features.append(dst_features)
@@ -232,46 +230,8 @@ class GraphSampler:
             edge_id_dict, num_sampled_nodes_dict, num_sampled_edges_dict
         )
 
-    def _sample_neighbors_from_db(
-        self, driver, node_ids, edge_types, num_samples,
-        node_time_dict, edge_time_dict, temporal_strategy, replace, directed,
-        disjoint, edge_weight_dict, rel_type, csc, hop
-    ):
-        if not directed:
-            raise NotImplementedError("Undirected graphs not supported yet")
-
-        query = f"MATCH (node:{node_type}) WHERE node.id IN {seeds.tolist()} WITH node "
-        alias = "node"
-        for hop in range(1, num_hops + 1):
-            for edge_type in edge_types:
-                src_type, rel_name, dst_type = edge_type if not csc else (edge_type[2], edge_type[1], edge_type[0])
-                relationship_query = f"-[{rel_name}:{src_type}__{rel_name}__{dst_type}]->({dst_type.lower()}_{hop}:{dst_type})"
-                query += f"OPTIONAL MATCH ({alias}){relationship_query} WITH node, "
-                alias += f", {dst_type.lower()}_{hop}"
-            query += f"ORDER BY rand() WITH " + ", ".join([f"{alias} LIMIT {batch_size * len(node_ids)}" for alias in alias.split(", ")])
-        query += " RETURN " + ", ".join([f"{alias}.id, {alias}.features" for alias in alias.split(", ")])
-
-        query_response = self._run_query(driver, query)
-        print("result len", len(query_response))
-
-        results = list()
-        for record in query_response:
-            dst_feature_vector = record[f"{dst_node}"]["features"]
-            if isinstance(dst_feature_vector, str) and ';' in dst_feature_vector:
-                dst_feature_vector = [float(x) for x in dst_feature_vector.split(';')]
-
-            results.append((
-                int(record[f"{src_node}.id"]),  # src_id
-                int(record[f"{dst_node}"]["id"]),  # dst_id
-                dst_feature_vector,  # dst_features
-                int(record[f"{dst_node}"]["label"]) if record[f"{dst_node}"]["label"] is not None else self.empty_label,
-                int(record["rel.id"]) if record["rel.id"] is not None else 0  # rel_id
-            ))
-
-        return results
-
     def get_src_attributes(self, driver, node_ids, src_type):
-        query = f"MATCH (node:{src_type}) WHERE node.id IN $node_ids RETURN node"
+        query = f"MATCH (node:{src_type}) WHERE node.id_int IN $node_ids RETURN node"
         query_response = self._run_query(driver, query, {"node_ids": node_ids})
 
         src_features_dict = dict()
@@ -280,8 +240,8 @@ class GraphSampler:
             feature_vector = record['node']['features']
             if isinstance(feature_vector, str) and ';' in feature_vector:
                 feature_vector = [float(x) for x in feature_vector.split(';')]
-            src_features_dict[record['node']["id"]] = feature_vector
-            src_labels_dict[record['node']["id"]] = int(record['node']["label"])
+            src_features_dict[record['node']["id_int"]] = feature_vector
+            src_labels_dict[record['node']["id_int"]] = int(record['node']["label"])
 
         src_features_sorted = list()
         src_labels_sorted = list()

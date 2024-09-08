@@ -69,8 +69,8 @@ def train(model, train_loader, test_loader, params, mode='no-backend'):
                 #     print(lst)
                 #     if isinstance(lst, list) and len(lst) > 1000:
                 #         raise ValueError()
-                print(batch['paper'].x.shape)
-                print(batch[('paper', 'cites', 'paper')].edge_index.shape)
+                # print(batch['paper'].x.shape)
+                # print(batch[('paper', 'cites', 'paper')].edge_index.shape)
                 logits = model(batch['paper'].x, batch[('paper', 'cites', 'paper')].edge_index)
                 loss = loss_fn(logits, batch['paper'].y)
             elif mode == 'neo4j':

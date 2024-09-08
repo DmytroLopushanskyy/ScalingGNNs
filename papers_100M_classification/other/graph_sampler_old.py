@@ -45,7 +45,7 @@ class GraphSampler:
             disjoint: bool = False,
             temporal_strategy: str = '',
             return_edge_id: bool = False,
-            batch_size: int = 4096
+            batch_size: int = 6000
     ) -> Tuple[Dict[str, torch.Tensor], Dict[str, torch.Tensor], Dict[str, torch.Tensor], Optional[Dict[str, torch.Tensor]], Dict[str, List[int]], Dict[str, List[int]]]:
         print("starting sampling")
         # Initialize dictionaries to store the output data
@@ -60,7 +60,7 @@ class GraphSampler:
 
         # Mapping from database node IDs to indices in node_id_dict
         node_id_to_index = {
-            node_type: {str(node_id.item()): idx for idx, node_id in enumerate(seeds)}
+            node_type: {node_id.item(): idx for idx, node_id in enumerate(seeds)}
             for node_type, seeds in seed_dict.items()
         }
 
@@ -77,131 +77,115 @@ class GraphSampler:
             raise NotImplementedError("Edge time not implemented")
         if node_time_dict: 
             raise NotImplementedError("Node time not implemented")
-        if return_edge_id:
-            print("return_edge_id time not implemented")
 
-        for edge_type in edge_types:
-            src_type, rel_name, dst_type = edge_type if not csc else (edge_type[2], edge_type[1], edge_type[0])
-            edge_type = f"{src_type}__{rel_name}__{dst_type}"
-            num_hops = len(num_neighbors_dict[edge_type])
-            print("num_hops", num_hops)
+        # Determine the number of hops to perform
+        num_hops = max(len(neighbors) for neighbors in num_neighbors_dict.values())
+        # Dict to keep track of seed nodes for each hop
+        seeds_per_hop = {0: {node_type: seed.clone().detach().tolist() for node_type, seed in seed_dict.items()}}
+        
+        for hop in range(num_hops):
+            for edge_type in edge_types:
+                src_type, rel_name, dst_type = edge_type if not csc else (edge_type[2], edge_type[1], edge_type[0])
+                relation_name = f"{src_type}__{rel_name}__{dst_type}"
 
-            # Retrieve seed nodes and neighbours
-            num_neighbors = num_neighbors_dict.get(edge_type, [0] * (num_hops + 1))
-            print("num_neighbors", num_neighbors)
-            seed_nodes = seed_dict.get(src_type)
-            if seed_nodes is None:
-                continue
+                # Retrieve seed nodes for this hop and source node type
+                current_src_nodes = seeds_per_hop[hop].get(src_type, [])
+                if not current_src_nodes:
+                    continue
 
-            new_nodes = list()
-            new_features = list()
-            new_labels = list()
-            seed_features = list()
-            seed_labels = list()
-            for batch_start in range(0, len(seed_nodes), batch_size):
-                batch_node_ids = seed_nodes[batch_start:batch_start + batch_size]
-                batch_node_ids = [str(x.item()) for x in batch_node_ids]  # Convert to string for the DB
+                num_neighbors = num_neighbors_dict.get(relation_name, [0] * (hop + 1))[hop]
+                print(f"Sampling {num_neighbors} neighbors for edge type {relation_name}, hop {hop} with {len(current_src_nodes)} seeds, batched by {batch_size}")
+                if num_neighbors == 0: 
+                    continue
 
-                src_var = src_type.lower()
-                query = f"MATCH ({src_var}:{src_type}) \nWHERE {src_var}.id IN {batch_node_ids} \nWITH {src_var} "
-                alias = f"{src_var}"
-                neo4j_vars = list()
-                hop_nodes_limit = 0
-                for hop in range(num_hops):
-                    hop_nodes_limit += num_neighbors[hop] * len(batch_node_ids)
-                    if num_neighbors[hop] == 0: 
-                        continue
-                    num = hop + 1
-                    for edge_type in edge_types:
-                        _, rel_name, dst_type = edge_type if not csc else (edge_type[2], edge_type[1], edge_type[0])
-                        relationship_query = f"-[{rel_name.lower()}_{num}:{rel_name}]->({dst_type.lower()}_{num}:{dst_type})"
-                        query += f"\nOPTIONAL MATCH ({alias}){relationship_query} "
-                        alias = f"{dst_type.lower()}_{num}"
-                        neo4j_vars.append(alias)
-                        joined_neo4j_vars = ', '.join(neo4j_vars)
-                        query += f"\nWITH {src_var}, {joined_neo4j_vars} "
-                    query += f"\nORDER BY rand() "
-                    query += f"\nWITH {src_var}, {joined_neo4j_vars} LIMIT {hop_nodes_limit} "
-                query += f" \nRETURN {src_var}.id, " + ", ".join([f"{alias}.id, {alias}.label, {alias}.features" for alias in neo4j_vars]) + ";"
-
-                # print("query", query)
-                query_response = self._run_query(driver, query)
-
-                src_features, src_labels = self.get_src_attributes(driver, batch_node_ids, src_type)
-                print("src attributes retrieved:", src_features.shape, src_labels.shape)
-                seed_features.append(src_features)
-                seed_labels.append(src_labels)
-                    
-                for record in query_response:
-                    src_id = record.get(f"{src_var}.id")
-                    for hop_node in neo4j_vars:
-                        dst_id = record.get(f"{hop_node}.id")
-                        if dst_id is None:
-                            continue
-                        dst_label = record.get(f"{hop_node}.label")
-                        dst_features = record.get(f"{hop_node}.features")
+                new_nodes = list()
+                new_features = list()
+                new_labels = list()
+                seed_features = list()
+                seed_labels = list()
+                for batch_start in range(0, len(current_src_nodes), batch_size):
+                    batch_node_ids = current_src_nodes[batch_start:batch_start + batch_size]
+                    batch_node_ids = [str(x) for x in batch_node_ids]  # Convert to string for the DB
+                    results = self._sample_neighbors_from_db(
+                        driver,
+                        batch_node_ids, src_type, dst_type, num_neighbors,
+                        node_time_dict, edge_time_dict, temporal_strategy,
+                        replace, directed, disjoint, edge_weight_dict, rel_name, csc, hop
+                    )
+                    if hop == 0:
+                        src_features, src_labels = self.get_src_attributes(driver, batch_node_ids, src_type)
+                        print("src attributes retrieved:", src_features.shape, src_labels.shape)
+                        seed_features.append(src_features)
+                        seed_labels.append(src_labels)
                         
+                    for src_id, dst_id, dst_features, dst_labels, rel_id in results:
                         # Map database IDs to indices
                         src_index = node_id_to_index[src_type].get(src_id)
                         dst_index = node_id_to_index[dst_type].get(dst_id)
                     
                         # Handle new nodes
                         if dst_index is None:
-                            dst_id = int(dst_id)
                             if dst_id in new_nodes:
                                 dst_index = len(node_id_dict[dst_type]) + new_nodes.index(dst_id) 
                             else:
                                 new_nodes.append(dst_id)
-                                if isinstance(dst_features, str) and ';' in dst_features:
-                                    dst_features = [float(x) for x in dst_features.split(';')]
                                 new_features.append(dst_features)
-                                new_labels.append(int(dst_label) if dst_label is not None else self.empty_label)
-                                # Assign the index to the new node position
+                                new_labels.append(dst_labels)
+                                # Temporarily assign the index to the new node position
                                 dst_index = len(node_id_dict[dst_type]) + len(new_nodes) - 1
 
                         # Add edges
                         if src_index is not None:
                             if csc:
-                                edge_source_dict[edge_type].append(dst_index)
-                                edge_target_dict[edge_type].append(src_index)
+                                edge_source_dict[relation_name].append(dst_index)
+                                edge_target_dict[relation_name].append(src_index)
                             else:
-                                edge_source_dict[edge_type].append(src_index)
-                                edge_target_dict[edge_type].append(dst_index)
+                                edge_source_dict[relation_name].append(src_index)
+                                edge_target_dict[relation_name].append(dst_index)
 
-                            # if return_edge_id:
-                            #     edge_id_dict[edge_type].append(rel_id)
+                            if return_edge_id:
+                                edge_id_dict[relation_name].append(rel_id)
 
-            # Consolidate batched data
-            seed_features = torch.cat(seed_features, dim=0)
-            node_features[src_type] = torch.cat((node_features.get(src_type, torch.tensor([], dtype=torch.float32)), seed_features))
-            seed_labels = torch.cat(seed_labels, dim=0)
-            node_labels[src_type] = torch.cat((node_labels.get(src_type, torch.tensor([], dtype=torch.float32)), seed_labels))
-            edge_source_dict[edge_type] = torch.tensor(edge_source_dict[edge_type], dtype=torch.int64)
-            edge_target_dict[edge_type] = torch.tensor(edge_target_dict[edge_type], dtype=torch.int64)
-            # if return_edge_id and edge_id_dict[rel_name]:
-            #     edge_id_dict[rel_name] = torch.tensor(edge_id_dict[rel_name], dtype=torch.int64)
+                # print(f"New nodes retrieved for hop {hop}: {len(new_nodes)}")
 
-            # Batch add new nodes to the node dictionary
-            print(f"New nodes retrieved for hop {hop}: {len(new_nodes)}")
-            if new_nodes:
-                new_node_tensor = torch.tensor(new_nodes, dtype=torch.int64)
-                new_features_tensor = torch.tensor(new_features, dtype=torch.int64)
-                new_labels_tensor = torch.tensor(new_labels, dtype=torch.int64)
-                
-                start_index = node_id_dict[dst_type].size(0)
-                node_id_dict[dst_type] = torch.cat((node_id_dict[dst_type], new_node_tensor))
-                # print("SHAPE", node_features[dst_type].shape, new_features_tensor.shape)
-                node_features[dst_type] = torch.cat((node_features[dst_type], new_features_tensor))
-                # print("#"*20,"new_features_tensor added", len(new_features_tensor))
-                node_labels[dst_type] = torch.cat((node_labels[dst_type], new_labels_tensor))
+                if seed_features:
+                    seed_features = torch.cat(seed_features, dim=0)
+                    node_features[src_type] = torch.cat((node_features.get(src_type, torch.tensor([], dtype=torch.float32)), seed_features))
+                    # print("#"*20, "src added", len(node_features[src_type]))
+                if seed_labels:
+                    seed_labels = torch.cat(seed_labels, dim=0)
+                    node_labels[src_type] = torch.cat((node_labels.get(src_type, torch.tensor([], dtype=torch.float32)), seed_labels))
 
-                # Update node_id_to_index with new nodes
-                for idx, node_id in enumerate(new_nodes):
-                    node_id_to_index[dst_type][node_id] = start_index + idx
+                # Batch add new nodes to the node dictionary
+                if new_nodes:
+                    new_node_tensor = torch.tensor(new_nodes, dtype=torch.int64)
+                    new_features_tensor = torch.tensor(new_features, dtype=torch.int64)
+                    new_labels_tensor = torch.tensor(new_labels, dtype=torch.int64)
+                    
+                    start_index = node_id_dict[dst_type].size(0)
+                    node_id_dict[dst_type] = torch.cat((node_id_dict[dst_type], new_node_tensor))
+                    # print("SHAPE", node_features[dst_type].shape, new_features_tensor.shape)
+                    node_features[dst_type] = torch.cat((node_features[dst_type], new_features_tensor))
+                    # print("#"*20,"new_features_tensor added", len(new_features_tensor))
+                    node_labels[dst_type] = torch.cat((node_labels[dst_type], new_labels_tensor))
 
-            # Update the number of sampled nodes and edges per hop
-            num_sampled_nodes_dict[dst_type].append(len(new_nodes))
-            num_sampled_edges_dict[edge_type].append(len(edge_source_dict[edge_type]))
+                    # Update node_id_to_index with new nodes
+                    for idx, node_id in enumerate(new_nodes):
+                        node_id_to_index[dst_type][node_id] = start_index + idx
+
+                    seeds_per_hop.setdefault(hop + 1, {}).setdefault(dst_type, []).extend(new_nodes)
+
+                # Update the number of sampled nodes and edges per hop
+                num_sampled_nodes_dict[dst_type].append(len(new_nodes))
+                num_sampled_edges_dict[relation_name].append(len(edge_source_dict[relation_name]))
+
+        # Convert lists to tensors
+        for rel_type in edge_types:
+            rel_name = f"{rel_type[0]}__{rel_type[1]}__{rel_type[2]}"
+            edge_source_dict[rel_name] = torch.tensor(edge_source_dict[rel_name], dtype=torch.int64)
+            edge_target_dict[rel_name] = torch.tensor(edge_target_dict[rel_name], dtype=torch.int64)
+            if return_edge_id and edge_id_dict[rel_name]:
+                edge_id_dict[rel_name] = torch.tensor(edge_id_dict[rel_name], dtype=torch.int64)
 
         # Ensure all node types are initialized in node_id_dict
         for node_type in node_types:
@@ -233,25 +217,35 @@ class GraphSampler:
         )
 
     def _sample_neighbors_from_db(
-        self, driver, node_ids, edge_types, num_samples,
+        self, driver, node_ids, src_node_type, dst_node_type, num_samples,
         node_time_dict, edge_time_dict, temporal_strategy, replace, directed,
         disjoint, edge_weight_dict, rel_type, csc, hop
     ):
-        if not directed:
-            raise NotImplementedError("Undirected graphs not supported yet")
+        # Determine the source and destination based on CSC (Compressed Sparse Column) format
+        src_label = dst_node_type if csc else src_node_type
+        dst_label = src_node_type if csc else dst_node_type
+        src_node = 'dst' if csc else 'src'
+        dst_node = 'src' if csc else 'dst'
+        
+        # Construct the base query for sampling neighbors
+        if directed:
+            query = f"MATCH ({dst_node}:{dst_label})<-[rel:{rel_type}]-({src_node}:{src_label})"
+        else:
+            query = f"MATCH ({src_node}:{src_label})-[rel:{rel_type}]-({dst_node}:{dst_label})"
 
-        query = f"MATCH (node:{node_type}) WHERE node.id IN {seeds.tolist()} WITH node "
-        alias = "node"
-        for hop in range(1, num_hops + 1):
-            for edge_type in edge_types:
-                src_type, rel_name, dst_type = edge_type if not csc else (edge_type[2], edge_type[1], edge_type[0])
-                relationship_query = f"-[{rel_name}:{src_type}__{rel_name}__{dst_type}]->({dst_type.lower()}_{hop}:{dst_type})"
-                query += f"OPTIONAL MATCH ({alias}){relationship_query} WITH node, "
-                alias += f", {dst_type.lower()}_{hop}"
-            query += f"ORDER BY rand() WITH " + ", ".join([f"{alias} LIMIT {batch_size * len(node_ids)}" for alias in alias.split(", ")])
-        query += " RETURN " + ", ".join([f"{alias}.id, {alias}.features" for alias in alias.split(", ")])
+        query += f" WHERE {src_node}.id IN $node_ids "
 
-        query_response = self._run_query(driver, query)
+        # Add temporal strategy conditions if not uniform
+        if temporal_strategy != "uniform":
+            if node_time_dict and dst_label in node_time_dict:
+                query += f" AND {dst_node}.timestamp <= {src_node}.timestamp"
+            if edge_time_dict and rel_type in edge_time_dict:
+                query += f" AND rel.timestamp <= {src_node}.timestamp"
+
+        query += f"RETURN {src_node}.id, {dst_node}, rel.id LIMIT $num_samples;"
+
+        parameters = {"node_ids": node_ids, "num_samples": num_samples * len(node_ids)}  # this means we can sample more than X per node but on avg no more than X per node
+        query_response = self._run_query(driver, query, parameters)
         print("result len", len(query_response))
 
         results = list()

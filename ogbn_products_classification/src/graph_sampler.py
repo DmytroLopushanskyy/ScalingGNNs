@@ -45,7 +45,7 @@ class GraphSampler:
             disjoint: bool = False,
             temporal_strategy: str = '',
             return_edge_id: bool = False,
-            batch_size: int = 4096
+            batch_size: int = 1024
     ) -> Tuple[Dict[str, torch.Tensor], Dict[str, torch.Tensor], Dict[str, torch.Tensor], Optional[Dict[str, torch.Tensor]], Dict[str, List[int]], Dict[str, List[int]]]:
         print("starting sampling")
         # Initialize dictionaries to store the output data
@@ -60,7 +60,7 @@ class GraphSampler:
 
         # Mapping from database node IDs to indices in node_id_dict
         node_id_to_index = {
-            node_type: {str(node_id.item()): idx for idx, node_id in enumerate(seeds)}
+            node_type: {node_id.item(): idx for idx, node_id in enumerate(seeds)}
             for node_type, seeds in seed_dict.items()
         }
 
@@ -124,7 +124,6 @@ class GraphSampler:
                     query += f"\nWITH {src_var}, {joined_neo4j_vars} LIMIT {hop_nodes_limit} "
                 query += f" \nRETURN {src_var}.id, " + ", ".join([f"{alias}.id, {alias}.label, {alias}.features" for alias in neo4j_vars]) + ";"
 
-                # print("query", query)
                 query_response = self._run_query(driver, query)
 
                 src_features, src_labels = self.get_src_attributes(driver, batch_node_ids, src_type)
@@ -147,11 +146,10 @@ class GraphSampler:
                     
                         # Handle new nodes
                         if dst_index is None:
-                            dst_id = int(dst_id)
                             if dst_id in new_nodes:
                                 dst_index = len(node_id_dict[dst_type]) + new_nodes.index(dst_id) 
                             else:
-                                new_nodes.append(dst_id)
+                                new_nodes.append(int(dst_id))
                                 if isinstance(dst_features, str) and ';' in dst_features:
                                     dst_features = [float(x) for x in dst_features.split(';')]
                                 new_features.append(dst_features)
@@ -223,7 +221,7 @@ class GraphSampler:
 
         # print("Edge sources:", edge_source_dict)
         # print("Edge targets:", edge_target_dict)
-        print("Total Nodes Sampled:", len(node_id_dict['PAPER']))
+        # print("Total Nodes Sampled:", len(node_id_dict['PRODUCT']))
         # print("node_features", len(self.node_features['PAPER'][hashed_indices]))
         # print("node_labels", len(self.node_labels['PAPER'][hashed_indices]))
 
@@ -231,6 +229,27 @@ class GraphSampler:
             edge_source_dict, edge_target_dict, node_id_dict,
             edge_id_dict, num_sampled_nodes_dict, num_sampled_edges_dict
         )
+
+    def get_src_attributes(self, driver, node_ids, src_type):
+        query = f"MATCH (node:{src_type}) WHERE node.id IN $node_ids RETURN node"
+        query_response = self._run_query(driver, query, {"node_ids": node_ids})
+
+        src_features_dict = dict()
+        src_labels_dict = dict()
+        for record in query_response:
+            feature_vector = record['node']['features']
+            if isinstance(feature_vector, str) and ';' in feature_vector:
+                feature_vector = [float(x) for x in feature_vector.split(';')]
+            src_features_dict[record['node']["id"]] = feature_vector
+            src_labels_dict[record['node']["id"]] = int(record['node']["label"])
+
+        src_features_sorted = list()
+        src_labels_sorted = list()
+        for seed_id in node_ids:
+            src_features_sorted.append(src_features_dict.get(seed_id, torch.nan))
+            src_labels_sorted.append(src_labels_dict.get(seed_id, self.empty_label))
+
+        return torch.tensor(src_features_sorted, dtype=torch.float32), torch.tensor(src_labels_sorted, dtype=torch.int64)
 
     def _sample_neighbors_from_db(
         self, driver, node_ids, edge_types, num_samples,
@@ -269,27 +288,6 @@ class GraphSampler:
             ))
 
         return results
-
-    def get_src_attributes(self, driver, node_ids, src_type):
-        query = f"MATCH (node:{src_type}) WHERE node.id IN $node_ids RETURN node"
-        query_response = self._run_query(driver, query, {"node_ids": node_ids})
-
-        src_features_dict = dict()
-        src_labels_dict = dict()
-        for record in query_response:
-            feature_vector = record['node']['features']
-            if isinstance(feature_vector, str) and ';' in feature_vector:
-                feature_vector = [float(x) for x in feature_vector.split(';')]
-            src_features_dict[record['node']["id"]] = feature_vector
-            src_labels_dict[record['node']["id"]] = int(record['node']["label"])
-
-        src_features_sorted = list()
-        src_labels_sorted = list()
-        for seed_id in node_ids:
-            src_features_sorted.append(src_features_dict.get(seed_id, torch.nan))
-            src_labels_sorted.append(src_labels_dict.get(seed_id, self.empty_label))
-
-        return torch.tensor(src_features_sorted, dtype=torch.float32), torch.tensor(src_labels_sorted, dtype=torch.int64)
 
     def get_tensor(self, attr: TensorAttr) -> Union[FeatureTensorType, None]:
         node_type = attr.group_name

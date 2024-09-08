@@ -29,8 +29,8 @@ def main():
 
     loader_params = {
         "num_neighbors": [12,12],
-        "batch_size": 1152,
-        "num_workers": 4,
+        "batch_size": 512,
+        "num_workers": 0,
         "filter_per_worker": False
     }
 
@@ -42,8 +42,8 @@ def main():
 
     mode = 'kuzu'
     train(model, train_loader, test_loader, model_params, mode)
-    test_accuracy = test(model, test_loader, mode)
-    print("Final test accuracy:", test_accuracy)
+    # test_accuracy = test(model, test_loader, mode)
+    # print("Final test accuracy:", test_accuracy)
 
 if __name__ == '__main__':
     main()

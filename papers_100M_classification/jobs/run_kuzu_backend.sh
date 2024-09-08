@@ -1,11 +1,11 @@
 #!/bin/bash
-#SBATCH --job-name=run_kuzu_backend_debug   # Job name
+#SBATCH --job-name=run_kuzu_backend   # Job name
 #SBATCH --partition=short            # Partition to submit to
 #SBATCH --ntasks=1                  # Number of tasks (1 for single core job)
-#SBATCH --cpus-per-task=8           # Number of CPU cores per task
-#SBATCH --mem=256GB                  # Memory per node
-#SBATCH --time=1:00:00             # Maximum runtime
-#SBATCH --output=logs/run_kuzu_backend_debug.log          # Output log file
+#SBATCH --cpus-per-task=1           # Number of CPU cores per task
+#SBATCH --mem=128GB                  # Memory per node
+#SBATCH --time=4:00:00             # Maximum runtime
+#SBATCH --output=final_experiments/13.log          # Output log file
 
 # 256 GB times out for 12,12,12
 # 384 GB - impossible to provision

@@ -14,10 +14,11 @@ from neo4j_remote_backend.client import Neo4jClient
 from neo4j_remote_backend.feature_store import Neo4jFeatureStore
 from neo4j_remote_backend.graph_store import Neo4jGraphStore
 from src.graph_sampler import GraphSampler
+import matplotlib.pyplot as plt
 
 import pandas as pd
 
-torch.manual_seed(12345)
+# torch.manual_seed(12345)
 
 
 def main():
@@ -37,8 +38,8 @@ def main():
     test_nodes = test_idx.tolist()
 
     loader_params = {
-        "num_neighbors": [2],
-        "batch_size": 1024,
+        "num_neighbors": [12,12],
+        "batch_size": 4096,
         "num_workers": 0,
         "filter_per_worker": False
     }
@@ -46,14 +47,26 @@ def main():
     train_loader = NeighborLoader(**loader_params, data=(feature_store, graph_store), input_nodes=('PAPER', train_nodes))
     test_loader = NeighborLoader(**loader_params, data=(feature_store, graph_store), input_nodes=('PAPER', test_nodes))
 
+    print("NeighborLoaders initialized")
     # model = CoraNodeClassification().to(device)
     model = GraphSAGE(in_channels=128, hidden_channels=1024, out_channels=172, num_layers=3).to(device)
 
     mode = 'neo4j'
-    train_mem_usage = memory_usage((train, (model, train_loader, test_loader, model_params, mode)))
-    print(f"Maximum memory usage during training: {max(train_mem_usage):.2f} MB")
-    test_mem_usage = memory_usage((test, (model, test_loader, mode)))
-    print(f"Maximum memory usage during testing: {max(test_mem_usage):.2f} MB")
+    interval = 0.1  # in seconds
+    train_mem_usage = memory_usage((train, (model, train_loader, test_loader, model_params, mode)), interval=interval)
+    print(f"Maximum memory usage during training: {max(train_mem_usage):.2f} MiB")
+    # test_mem_usage = memory_usage((test, (model, test_loader, mode)))
+    # print(f"Maximum memory usage during testing: {max(test_mem_usage):.2f} MB")
+    # time_in_seconds = [i * interval for i in range(len(train_mem_usage))]
+    # memory_log = pd.DataFrame({'Time (s)': time_in_seconds, 'Memory Usage (MiB)': train_mem_usage })
+    # memory_log.to_csv('memory_usage_log.csv', index=False)
+    # plt.figure(figsize=(10, 6))
+    # plt.plot(memory_log['Time (s)'], memory_log['Memory Usage (MiB)'], label='Memory Usage')
+    # plt.xlabel('Time (s)')
+    # plt.ylabel('Memory Usage (MiB)')
+    # plt.title('Memory Usage Over Time During Training')
+    # plt.legend()
+    # plt.savefig('4096_memory_usage_plot.png')
 
 
 if __name__ == '__main__':

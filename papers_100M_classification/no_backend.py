@@ -12,12 +12,15 @@ from torch_geometric.data import HeteroData
 
 import numpy as np
 import pandas as pd
+from datetime import datetime
+import matplotlib.pyplot as plt
 
 from ogb.nodeproppred import PygNodePropPredDataset
 
 torch.manual_seed(12345)
 
 def main():
+    print("#"*40 + f" Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     builtins.input = lambda _: 'N'
     dataset = PygNodePropPredDataset(name='ogbn-papers100M')
     # split_idx = dataset.get_idx_split()
@@ -41,9 +44,9 @@ def main():
     test_nodes = test_idx.tolist()
 
     loader_params = {
-        "num_neighbors": [12,12,12],
-        "batch_size": 1152,
-        "num_workers": 4,
+        "num_neighbors": [12,12],
+        "batch_size": 4096,
+        "num_workers": 0,
         "filter_per_worker": False
     }
 
@@ -53,10 +56,21 @@ def main():
     # model = CoraNodeClassification().to(device)
     model = GraphSAGE(in_channels=128, hidden_channels=1024, out_channels=172, num_layers=3).to(device)
 
-    train_mem_usage = memory_usage((train, (model, train_loader, test_loader, model_params)))
+    interval = 0.1  # in seconds
+    train_mem_usage = memory_usage((train, (model, train_loader, test_loader, model_params)), interval=interval)
     print(f"Maximum memory usage during training: {max(train_mem_usage):.2f} MB")
-    test_mem_usage = memory_usage((test, (model, test_loader)))
-    print(f"Maximum memory usage during testing: {max(test_mem_usage):.2f} MB")
+    # test_mem_usage = memory_usage((test, (model, test_loader)))
+    # print(f"Maximum memory usage during testing: {max(test_mem_usage):.2f} MB")
+    # time_in_seconds = [i * interval for i in range(len(train_mem_usage))]
+    # memory_log = pd.DataFrame({'Time (s)': time_in_seconds, 'Memory Usage (MiB)': train_mem_usage })
+    # memory_log.to_csv('no_backend_16_memory_usage_log.csv', index=False)
+    # plt.figure(figsize=(10, 6))
+    # plt.plot(memory_log['Time (s)'], memory_log['Memory Usage (MiB)'], label='Memory Usage')
+    # plt.xlabel('Time (s)')
+    # plt.ylabel('Memory Usage (MiB)')
+    # plt.title('Memory Usage Over Time During Training')
+    # plt.legend()
+    # plt.savefig('no_backend_memory_usage_plot.png')
 
 
 if __name__ == '__main__':
