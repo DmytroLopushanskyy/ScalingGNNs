@@ -1,6 +1,18 @@
 # **Scaling Graph Neural Networks With Graph Databases**
 
-This repository contains multiple projects focused on scaling Graph Neural Networks (GNNs) using remote backends like Neo4j, Kuzu, and in-memory processing. Each project addresses different datasets, such as **ogbn-products**, **ogbn-papers100M**, and more, showcasing various approaches to handling large-scale graph data.
+This repository contains multiple projects focused on scaling Graph Neural Networks (GNNs) using remote backends like Neo4j, Kuzu, and in-memory processing. The following directories contain experiment details and implementation for the following datasets: cora, ogbn-products, and ogbn-papers100M:
+- cora_classification
+- products_classification
+- papers_100M_classification
+
+Another directory is ```distributed_training```, which contains our implementation and results for the distributed architecture.
+
+Finally, we provide an additional directory ```neo4j_remote_backend```, which contains our key abstractions, such as:
+- **Custom GraphStore**
+- **Custom FeatureStore**
+- **Neo4j Client**
+
+These scripts are reused in the specific implementations of the projects.
 
 ### **Structure of the Repository**
 
@@ -9,13 +21,6 @@ Each project in this repository tackles a specific dataset with its own implemen
 - Running GNN models using remote and in-memory backends.
 - Custom environment setup for each project.
 - Training and evaluation scripts for the specific dataset.
-
-Additionally, there is a folder called **neo4j_remote_backend**, which contains our key abstractions like:
-- **Custom GraphStore**
-- **Custom FeatureStore**
-- **Neo4j Client**
-
-These abstractions are reused in the specific implementations of the projects.
 
 ### **Environment Setup**
 
