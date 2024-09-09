@@ -1,6 +1,6 @@
 # **Single-Machine Training with Neo4j and In-Memory for Products Classification**
 
-This repository demonstrates single-machine GNN training for node classification on the **Products** dataset, using two backends: Neo4j and in-memory processing. The approach integrates Neo4j graph databases to manage graph data and supports memory-efficient training by relying on external graph stores.
+This repository demonstrates single-machine GNN training for node classification on the **Products** dataset, using two backends: Neo4j and in-memory processing.
 
 ## **Overview**
 
@@ -61,12 +61,9 @@ python no_backend.py
   - `memory_usage_plot.png`: Plot showing memory usage during training.
 
 - **`src/`**: Core code for training and backend interaction.
-  - `client.py`: Handles the connection and querying from Neo4j.
-  - `feature_store.py`: Manages feature storage and retrieval.
   - `graph_sage.py`: GraphSAGE model architecture for node classification.
   - `graph_sampler.py`: Custom graph sampling for efficient training.
-  - `graph_store.py`: Manages graph data retrieval from Neo4j.
-  - `train_test.py`: Auxiliary script to handle training logic (not called directly).
+  - `train_test.py`: Training and testing algorithm.
 
 
 ## **References**
