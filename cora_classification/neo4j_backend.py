@@ -10,7 +10,7 @@ from src.utils import model_params, device, test_mask
 from src.train_test import train, test
 
 from src.utils import loader_params, train_mask
-from neo4j_remote_backend.client import Neo4jClient
+from neo4j_remote_backend.client_for_cora import Neo4jClient
 from neo4j_remote_backend.feature_store import Neo4jFeatureStore
 from neo4j_remote_backend.graph_store import Neo4jGraphStore
 

@@ -61,7 +61,7 @@ Some OGBN datasets are automatically downloaded in the NPY format. However, it i
 sbatch jobs/transform_npy_to_csv.sh
 ```
 
-### **Running the Models**
+### **Running the Model**
 
 #### **Neo4j Backend**
 
@@ -105,7 +105,7 @@ sbatch jobs/run_no_backend.sh
   - `train_test.py`: Core script for training and evaluation.
   - `utils.py`: Utility functions for configuration reading.
 
-- **`config/`**: Contains configuration files for different backends and models.
+- **`config/`**: Contains configuration files for different applications.
   - `loader_params.json`: Parameters for loading the dataset.
   - `model_params.json`: Parameters for the model architecture and training.
 

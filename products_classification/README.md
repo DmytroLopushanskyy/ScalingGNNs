@@ -1,14 +1,10 @@
-# **Single-Machine Training with Neo4j and In-Memory for Products Classification**
+# **Single-Machine Training with Neo4j for Products Classification**
 
-This repository demonstrates single-machine GNN training for node classification on the **Products** dataset, using two backends: Neo4j and in-memory processing.
+This repository demonstrates single-machine GNN training for node classification on the **Products** dataset, using Neo4j backend.
 
 ## **Overview**
 
 The **Products dataset** is part of the Open Graph Benchmark (OGB) and is designed for node classification tasks. Each node represents a product, and each edge signifies a co-purchase event between products. The goal is to predict the product category based on its connections to other products.
-
-We demonstrate GNN training using two backends:
-1. **Neo4j**: Graph data is queried in real-time from a Neo4j database, allowing efficient memory use.
-2. **In-Memory**: The entire graph is loaded into memory for traditional training.
 
 ### **Setup and Installation**
 
@@ -29,14 +25,7 @@ cp ScalingGNN/torch_geom_neighbor_sampler.py <miniconda_path>/envs/neo4j-backend
 ```
 This modified `neighbor_sampler.py` is crucial for running GNN training with Neo4j integration.
 
-For the in-memory method, create a duplicate environment without the Neo4j-specific changes:
-```bash
-conda create --clone neo4j-backend --name no-backend
-# Activate the environment
-conda activate no-backend
-```
-
-### **Running the Models**
+### **Running the Model**
 
 #### **Neo4j Backend**
 
@@ -45,17 +34,9 @@ Ensure Neo4j is running, and the Products dataset is loaded into the database. Y
 python neo4j_backend.py
 ```
 
-#### **In-Memory**
-
-For the traditional in-memory method, simply run:
-```bash
-python no_backend.py
-```
-
 ### **Repository Structure**
 
 - **`neo4j_backend.py`**: Script for Neo4j backend operations.
-- **`no_backend.py`**: Script for in-memory operations.
 
 - **`plots/`**: Contains visualisations of memory usage and other performance metrics.
   - `memory_usage_plot.png`: Plot showing memory usage during training.

@@ -39,7 +39,7 @@ conda create --clone neo4j-backend --name kuzu-backend
 conda activate kuzu-backend
 ```
 
-### **Running the Models**
+### **Running the Model**
 
 #### **Neo4j Backend**
 
@@ -74,7 +74,7 @@ python src/train_test.py --backend memory
 
 ## **Repository Structure**
 
-- **`config/`**: Contains configuration files for different backends and models.
+- **`config/`**: Contains configuration files for different applications.
   - `loader_params.json`: Parameters for loading the dataset.
   - `model_params.json`: Parameters for the model architecture and training.
   

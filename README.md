@@ -16,9 +16,9 @@ These scripts are reused in the specific implementations of the projects.
 
 ### **Structure of the Repository**
 
-Each project in this repository tackles a specific dataset with its own implementation and backend setup. You can find **individual README files** within each folder for detailed instructions on how to run the models, configure environments, and process data for each specific task. These README files cover information like:
+Each project in this repository tackles a specific dataset with its own implementation and backend setup. You can find **individual README files** within each folder for detailed instructions on how to run the GraphSAGE model, configure environments, and process data for each specific task. These README files cover information like:
 - How to load datasets into backends (Neo4j, Kuzu).
-- Running GNN models using remote and in-memory backends.
+- Running GraphSAGE model using remote and in-memory backends.
 - Custom environment setup for each project.
 - Training and evaluation scripts for the specific dataset.
 
