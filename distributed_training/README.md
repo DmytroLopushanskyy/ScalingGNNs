@@ -53,18 +53,12 @@ conda activate kuzu-backend
 
 ## **Installation**
 
-1. Clone the repository:
-   ```bash
-   git clone <repo-url>
-   cd <repo-directory>
-   ```
-
-2. Install the necessary dependencies using Conda or your environment directly:
+1. Install the necessary dependencies using Conda or your environment directly:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Set up Neo4j:
+2. Set up Neo4j:
    - Load the graph dataset into Neo4j using the provided script:
      ```bash
      python loaders/load_into_neo4j.py --dataset ogbn-products
