@@ -22,17 +22,6 @@ def main():
     feature_store = Neo4jFeatureStore(db)
     graph_store = Neo4jGraphStore(db)
 
-    # loader = NeighborLoader(**loader_params, data=(feature_store, graph_store), input_nodes=('Paper', train_mask))
-    #
-    # for batch in loader:
-    #     # print(batch['Paper'].features)
-    #     print("Features (Non-zero indices):")
-    #     print(batch['Paper'].features.shape)
-    #     # non_zero_indices = [i for i, value in enumerate(batch['Paper'].features) if value != 0]
-    #     # print(non_zero_indices)
-    #     print(batch[('Paper', 'CITES', 'Paper')].edge_index.tolist(), batch[('Paper', 'CITES', 'Paper')].edge_index.shape)
-    #     break
-
     train_loader = NeighborLoader(**loader_params, data=(feature_store, graph_store), input_nodes=('Paper', train_mask))
     test_loader = NeighborLoader(**loader_params, data=(feature_store, graph_store), input_nodes=('Paper', test_mask))
 

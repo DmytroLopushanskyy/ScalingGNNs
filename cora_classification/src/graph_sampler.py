@@ -113,7 +113,6 @@ class GraphSampler:
                 if return_edge_id:
                     out_edge_id_dict[rel_type] = torch.tensor(edges, dtype=torch.int64)
 
-        # print("nodes sampled:", len(out_node_id_dict['Paper']))
         return (
             out_row_dict, out_col_dict, out_node_id_dict,
             out_edge_id_dict, num_sampled_nodes_per_hop_dict, num_sampled_edges_per_hop_dict
@@ -151,7 +150,6 @@ class GraphSampler:
         query += " ORDER BY r LIMIT $num_samples"
 
         result = self._run_query(driver, query, parameters)
-        # print(result)
         return [record["dst.ID"] for record in result]
 
     def _get_edges_from_db(self, driver, src_node_id, rel_type, node_time_dict, directed):

@@ -3,7 +3,7 @@ import re
 import pandas as pd
 
 # Read the log file
-log_file_path = '/data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/logs/19-07-run_neo4j_output.log'
+log_file_path = '/data/project/anonym/ScalingGNNs/papers_100M_classification/logs/neo4j_output.log'
 with open(log_file_path, 'r') as file:
     log_data = file.readlines()
 

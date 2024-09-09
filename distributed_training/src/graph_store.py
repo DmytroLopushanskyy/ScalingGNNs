@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from torch_geometric.typing import EdgeTensorType, EdgeType, OptTensor
 from torch_geometric.data.graph_store import EdgeAttr, EdgeLayout, GraphStore
-from neo4j_remote_backend.client import Neo4jClient
+from src.client import Neo4jClient
 
 
 class Neo4jGraphStore(GraphStore):
@@ -20,16 +20,16 @@ class Neo4jGraphStore(GraphStore):
         self.num_threads = num_threads
 
     def _put_edge_index(self, edge_index: EdgeTensorType, edge_attr: EdgeAttr) -> None:
-        pass
+        print("_put_edge_index", edge_index, edge_attr)
 
     def _get_edge_index(self, edge_attr: EdgeAttr) -> EdgeTensorType | None:
         """ Returns all edges"""
-        return None
+        pass
 
     def _remove_edge_index(self, edge_attr: EdgeAttr) -> None:
-        pass
+        print("_remove_edge_index", edge_attr)
     
     def get_all_edge_attrs(self) -> list[EdgeAttr]:
         """Returns all registered edge attributes."""
-        # [EdgeAttr(edge_type=('Paper', 'CITES', 'Paper'), layout=EdgeLayout('coo'), is_sorted=True, size=(111059956, 111059956))]
+        # return [EdgeAttr(edge_type=('PRODUCT', 'LINK', 'PRODUCT'), layout=EdgeLayout('coo'), is_sorted=True, size=(61859140, 61859140))]
         return self.client.get_edge_groups_and_attributes()

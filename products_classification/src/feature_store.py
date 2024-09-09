@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from torch_geometric.typing import FeatureTensorType
 from torch_geometric.data.feature_store import TensorAttr, FeatureStore
-from neo4j_remote_backend.client import Neo4jClient
+from src.client import Neo4jClient
 
 from src.graph_sampler import GraphSampler
 
@@ -34,5 +34,4 @@ class Neo4jFeatureStore(FeatureStore):
 
     def get_all_tensor_attrs(self) -> list[TensorAttr]:
         """Return all TensorAttr from the table nodes."""
-        # return [TensorAttr('paper', 'id', None), TensorAttr('paper', 'x', None), TensorAttr('paper', 'y', None)]
         return self.client.get_node_groups_and_features()

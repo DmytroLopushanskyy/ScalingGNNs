@@ -16,7 +16,6 @@ class Neo4jClient:
         self.__driver = GraphDatabase.driver(uri, auth=(user, password))
 
     def get_node_groups_and_features(self):
-        # return [TensorAttr(group_name='PAPER', attr_name='id', index=None), TensorAttr(group_name='PAPER', attr_name='features', index=None), TensorAttr(group_name='PAPER', attr_name='label', index=None)]
         with self.__driver.session() as session:
             query = """
             MATCH (n)
@@ -31,11 +30,9 @@ class Neo4jClient:
                 node_type = record["NodeType"]
                 for attr in set(record["UniqueKeys"]):
                     node_groups_and_features.append(TensorAttr(node_type, attr))
-            print("node_groups_and_features", node_groups_and_features)
             return node_groups_and_features
 
     def get_edge_groups_and_attributes(self):
-        # return [EdgeAttr(edge_type=('Paper', 'CITES', 'Paper'), layout=EdgeLayout('coo'), is_sorted=True, size=(2708, 2708))]
         with self.__driver.session() as session:
             query = """
                         MATCH (a)-[r]->(b)
@@ -48,7 +45,7 @@ class Neo4jClient:
             for record in results:
                 edge_type = (record["SourceType"], record["EdgeType"], record["TargetType"])
                 layout = EdgeLayout('coo')
-                is_sorted = True
+                is_sorted = True  # Assume the edges are sorted
                 size = (record["edge_count"], record["edge_count"])
                 edge_groups_and_attributes.append(EdgeAttr(
                     edge_type=edge_type,
@@ -63,40 +60,32 @@ class Neo4jClient:
         attr_name = attr.attr_name
         indices = attr.index
 
-        # Convert indices to strings
-        if isinstance(indices, torch.Tensor):
-            indices = indices.tolist()
-        if isinstance(indices, (list, np.ndarray, tuple)):
-            indices = [str(int(idx)) for idx in indices]
-        elif isinstance(indices, int):
-            indices = str(indices)
-        elif isinstance(indices, slice):
-            indices_start = str(indices.start) if indices.start is not None else None
-            indices_stop = str(indices.stop) if indices.stop is not None else None
-            indices_step = str(indices.step) if indices.step is not None else None
-
         match_clause = f"MATCH (item:{table_name})"
         return_clause = f"RETURN item.{attr_name}"
 
         if indices is None:
             where_clause = ""
         elif isinstance(indices, int):
-            where_clause = f"WHERE item.id = {indices}"
+            where_clause = f"WHERE item.ID = {indices}"
         elif isinstance(indices, slice):
             if indices.step is None or indices.step == 1:
-                where_clause = f"WHERE item.id >= {indices.start} AND item.id < {indices.stop}"
+                where_clause = f"WHERE item.ID >= {indices.start} AND item.ID < {indices.stop}"
             else:
                 where_clause = (
-                    f"WHERE item.id >= {indices.start} AND item.id < {indices.stop} "
-                    f"AND (item.id - {indices.start}) % {indices.step} = 0"
+                    f"WHERE item.ID >= {indices.start} AND item.ID < {indices.stop} "
+                    f"AND (item.ID - {indices.start}) % {indices.step} = 0"
                 )
         elif isinstance(indices, (torch.Tensor, list, np.ndarray, tuple)):
-            where_clause = f"WHERE item.id IN {indices}"
+            where_clause = "WHERE"
+            for i in indices:
+                where_clause += f" item.ID = {int(i)} OR"
+            where_clause = where_clause[:-3]
         else:
             msg = f"Invalid attr.index type: {type(indices)!s}"
             raise ValueError(msg)
 
         query = f"{match_clause} {where_clause} {return_clause}"
+
         with self.__driver.session() as session:
             result = session.run(query)
             result_list = list()
@@ -106,13 +95,6 @@ class Neo4jClient:
                     feature_vector = [float(x) for x in feature_vector.split(';')]
                 result_list.append(feature_vector)
 
-        # Handle stringified ID case and None values
-        result_list = [
-            int(res) if isinstance(res, str) 
-            else (np.nan if res is None else res) 
-            for res in result_list
-        ]
-
         return torch.tensor(result_list)
 
     def get_all_edges(self, edge_attr: EdgeAttr):
@@ -120,7 +102,6 @@ class Neo4jClient:
             # Query to fetch node types, features, and edges
             query = f"""
             MATCH (n)-[r:{edge_attr.edge_type[1]}]->(m)
-            WHERE labels(n) IS NOT NULL
             WITH DISTINCT labels(n) AS NodeTypes, n, id(n) AS StartNode, id(m) AS EndNode
             RETURN collect([StartNode, EndNode]) AS Edges
             """

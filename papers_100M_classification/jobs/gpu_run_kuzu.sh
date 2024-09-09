@@ -10,8 +10,8 @@
 #SBATCH --error=logs/gpu_run_kuzu.log    # Error log file
 
 # Load Conda environment
-source /home/kebl7757/miniconda3/etc/profile.d/conda.sh
-conda activate py3.9-pyg
+source /home/anonym/miniconda3/etc/profile.d/conda.sh
+conda activate python3.9-pyg
 
 # Run the Python script
 python kuzu_backend.py

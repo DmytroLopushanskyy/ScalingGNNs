@@ -1,54 +1,37 @@
-# Scaling Up GNNs with Remote Backends
+# **Scaling Graph Neural Networks With Graph Databases**
 
-## NeighborLoader
+This repository contains multiple projects focused on scaling Graph Neural Networks (GNNs) using remote backends like Neo4j, Kuzu, and in-memory processing. Each project addresses different datasets, such as **ogbn-products**, **ogbn-papers100M**, and more, showcasing various approaches to handling large-scale graph data.
 
-Intuitively, NeighborLoader performs the following steps:
-1. The loader picks the next set of nodes based on the batch size.
-2. It samples the specified number of neighbors for these nodes.
-3. It constructs a subgraph with these nodes and their sampled neighbors.
-4. The subgraph is then used for a training iteration of your GNN.
+### **Structure of the Repository**
 
-Actual sampling happens either through pyg-lib or torch-sparse. See source code below:
-```python
-out = torch.ops.torch_sparse.hetero_neighbor_sample(
-    self.node_types,
-    self.edge_types,
-    self.colptr_dict,
-    self.row_dict,
-    seed,  # seed_dict
-    self.num_neighbors.get_mapped_values(self.edge_types),
-    self.num_neighbors.num_hops,
-    self.replace,
-    self.subgraph_type != SubgraphType.induced,
-)
-```
+Each project in this repository tackles a specific dataset with its own implementation and backend setup. You can find **individual README files** within each folder for detailed instructions on how to run the models, configure environments, and process data for each specific task. These README files cover information like:
+- How to load datasets into backends (Neo4j, Kuzu).
+- Running GNN models using remote and in-memory backends.
+- Custom environment setup for each project.
+- Training and evaluation scripts for the specific dataset.
 
-## Processing large datasets
+### **Environment Setup**
 
-Loading a large csv file into Kuzu requires significant memory usage. For example, a job loading 30GB of edges into Kuzu with 16 GB memory limited failed with out-of-memory error.
+To set up the environment for running the various projects, use the following steps:
 
-To avoid loading a big file into Kuzu in one go, I decided to split it into 1GB-sized partitions. This was done using the following command:
-```
-split -b 1G /data/coml-intersection-joins/kebl7757/ScalingGNNsapers_100M_classification/data/papers100M/processed/edge_index.csv /data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/data/papers100M/processed/split_
-```
-
-However, this may cause artifacts at the beginning and end of each splitted file as a single CSV line might be split broken between two files. To fix this, I've created a bash script `print_first_last_lines.sh` that prints out the first and last line that can be merged manually.
-
-Finally, the `remove_first_last_lines.sh` needs to be run to delete the first and last line from each csv file. The manually corrected lines can then be inserted in a seperate csv file.
-
-
-### Env installation
-
-```
+1. Install PyTorch and the required packages:
+```bash
 conda install pytorch==2.3.0 torchvision torchaudio cpuonly -c pytorch
+```
+2. Install CMake and GCC:
+```bash
 conda install -c conda-forge cmake
 conda install -c conda-forge gcc=9 gxx=9
+```
+3. Install `pyg-lib` for efficient sampling:
+```bash
 pip install git+https://github.com/pyg-team/pyg-lib.git@0.4.0
 ```
 
-### Custom sampler
+### **Custom Sampler**
 
-Change file located at
+For the Neo4j backend, you need to replace the default `neighbor_sampler.py` in the PyTorch Geometric installation. The file is located at:
+```bash
+/home/anonym/miniconda3/envs/CONDA_ENV_NAME/lib/python3.9/site-packages/torch_geometric/sampler/neighbor_sampler.py
 ```
-/home/kebl7757/miniconda3/envs/py3.9-pyg/lib/python3.9/site-packages/torch_geometric/sampler/neighbor_sampler.py
-```
+Use the custom sampler ```torch_geom_neighbor_sampler.py``` provided in the repository for optimal sampling performance during training.

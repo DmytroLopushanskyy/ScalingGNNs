@@ -21,6 +21,8 @@ class GraphSampler:
         self.node_labels = dict()
         self.node_ids = dict()
         self.empty_label = -9223372036854775808
+        self.edge_key = "PRODUCT__LINK__PRODUCT"
+        self.node_key = "PRODUCT"
 
     def _run_query(self, driver, query, parameters=None):
         # Executes a query on the Neo4j database and returns the result.
@@ -34,7 +36,7 @@ class GraphSampler:
             driver: GraphDatabase.driver,
             node_types: List[str],
             edge_types: List[Tuple[str, str, str]],
-            seed_dict: Dict[str, torch.Tensor],  # Seeds for each node type
+            seed_dict: Dict[str, torch.Tensor],
             num_neighbors_dict: Dict[str, List[int]],
             node_time_dict: Optional[Dict[str, Dict[int, int]]] = None,
             edge_time_dict: Optional[Dict[str, Dict[int, int]]] = None,
@@ -109,8 +111,8 @@ class GraphSampler:
                     if num_neighbors[hop] == 0: 
                         continue
                     num = hop + 1
-                    for edge_type in edge_types:
-                        _, rel_name, dst_type = edge_type if not csc else (edge_type[2], edge_type[1], edge_type[0])
+                    for edge in edge_types:
+                        _, rel_name, dst_type = edge if not csc else (edge[2], edge[1], edge[0])
                         relationship_query = f"-[{rel_name.lower()}_{num}:{rel_name}]->({dst_type.lower()}_{num}:{dst_type})"
                         query += f"\nOPTIONAL MATCH ({alias}){relationship_query} "
                         alias = f"{dst_type.lower()}_{num}"
@@ -133,14 +135,15 @@ class GraphSampler:
                         dst_id = record.get(f"{hop_node}.id")
                         if dst_id is None:
                             continue
+                        else:
+                            dst_id = int(dst_id)
                         dst_label = record.get(f"{hop_node}.label")
                         dst_features = record.get(f"{hop_node}.features")
                         
                         # Map database IDs to indices
                         src_index = node_id_to_index[src_type].get(src_id)
                         dst_index = node_id_to_index[dst_type].get(dst_id)
-                        # print(src_type, dst_type)  # PRODUCT PRODUCT
-                    
+
                         # Handle new nodes
                         if dst_index is None:
                             dst_id = int(dst_id)
@@ -173,7 +176,6 @@ class GraphSampler:
             edge_target_dict[edge_type] = torch.tensor(edge_target_dict[edge_type], dtype=torch.int64)
 
             # Batch add new nodes to the node dictionary
-            print(f"New nodes retrieved for hop {hop}: {len(new_nodes)}")
             if new_nodes:
                 new_node_tensor = torch.tensor(new_nodes, dtype=torch.int64)
                 new_features_tensor = torch.tensor(new_features, dtype=torch.int64)
@@ -181,7 +183,9 @@ class GraphSampler:
                 
                 start_index = node_id_dict[dst_type].size(0)
                 node_id_dict[dst_type] = torch.cat((node_id_dict[dst_type], new_node_tensor))
+                # print("SHAPE", node_features[dst_type].shape, new_features_tensor.shape)
                 node_features[dst_type] = torch.cat((node_features[dst_type], new_features_tensor))
+                # print("#"*20,"new_features_tensor added", len(new_features_tensor))
                 node_labels[dst_type] = torch.cat((node_labels[dst_type], new_labels_tensor))
 
                 # Update node_id_to_index with new nodes
@@ -210,9 +214,14 @@ class GraphSampler:
             self.node_labels[node_type][hashed_indices] = node_labels[node_type]
             self.node_ids[node_type][hashed_indices] = node_id_dict[node_type]
 
+        
+        edge_id_dict[self.edge_key] = torch.tensor([], dtype=torch.int64)
+        num_sampled_nodes_dict[self.node_key] = torch.tensor(num_sampled_nodes_dict[self.node_key], dtype=torch.int64)
+        num_sampled_edges_dict[self.edge_key] = torch.tensor(num_sampled_edges_dict[self.edge_key], dtype=torch.int64)
+
         return (
-            edge_source_dict, edge_target_dict, node_id_dict,
-            edge_id_dict, num_sampled_nodes_dict, num_sampled_edges_dict
+            edge_source_dict[self.edge_key], edge_target_dict[self.edge_key], node_id_dict[self.node_key],
+            edge_id_dict[self.edge_key], num_sampled_nodes_dict[self.node_key], num_sampled_edges_dict[self.edge_key]
         )
 
     def get_src_attributes(self, driver, node_ids, src_type):

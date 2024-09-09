@@ -17,13 +17,11 @@ import matplotlib.pyplot as plt
 
 from ogb.nodeproppred import PygNodePropPredDataset
 
-torch.manual_seed(12345)
 
 def main():
     print("#"*40 + f" Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     builtins.input = lambda _: 'N'
     dataset = PygNodePropPredDataset(name='ogbn-papers100M')
-    # split_idx = dataset.get_idx_split()
     
     hetero_data = HeteroData()
     data = dataset[0]
@@ -32,13 +30,12 @@ def main():
     hetero_data['paper'].num_nodes = data.num_nodes
     hetero_data['paper', 'cites', 'paper'].edge_index = data.edge_index
     
-    # train_idx, valid_idx, test_idx = split_idx['train'], split_idx['valid'], split_idx['test']
-    train_path = "/data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/dataset/ogbn_papers100M/split/time/train.csv.gz"
+    train_path = "/data/project/anonym/ScalingGNNs/papers_100M_classification/dataset/ogbn_papers100M/split/time/train.csv.gz"
     train_df = pd.read_csv(train_path, compression='gzip', header=None)
     train_idx = torch.tensor(train_df[0].values, dtype=torch.long)
     train_nodes = train_idx.tolist()
 
-    test_path = "/data/coml-intersection-joins/kebl7757/ScalingGNNs/papers_100M_classification/dataset/ogbn_papers100M/split/time/test.csv.gz"
+    test_path = "/data/project/anonym/ScalingGNNs/papers_100M_classification/dataset/ogbn_papers100M/split/time/test.csv.gz"
     test_df = pd.read_csv(test_path, compression='gzip', header=None)
     test_idx = torch.tensor(test_df[0].values, dtype=torch.long)
     test_nodes = test_idx.tolist()
@@ -59,18 +56,19 @@ def main():
     interval = 0.1  # in seconds
     train_mem_usage = memory_usage((train, (model, train_loader, test_loader, model_params)), interval=interval)
     print(f"Maximum memory usage during training: {max(train_mem_usage):.2f} MB")
-    # test_mem_usage = memory_usage((test, (model, test_loader)))
-    # print(f"Maximum memory usage during testing: {max(test_mem_usage):.2f} MB")
-    # time_in_seconds = [i * interval for i in range(len(train_mem_usage))]
-    # memory_log = pd.DataFrame({'Time (s)': time_in_seconds, 'Memory Usage (MiB)': train_mem_usage })
-    # memory_log.to_csv('no_backend_16_memory_usage_log.csv', index=False)
-    # plt.figure(figsize=(10, 6))
-    # plt.plot(memory_log['Time (s)'], memory_log['Memory Usage (MiB)'], label='Memory Usage')
-    # plt.xlabel('Time (s)')
-    # plt.ylabel('Memory Usage (MiB)')
-    # plt.title('Memory Usage Over Time During Training')
-    # plt.legend()
-    # plt.savefig('no_backend_memory_usage_plot.png')
+    test_mem_usage = memory_usage((test, (model, test_loader)))
+    print(f"Maximum memory usage during testing: {max(test_mem_usage):.2f} MB")
+    
+    time_in_seconds = [i * interval for i in range(len(train_mem_usage))]
+    memory_log = pd.DataFrame({'Time (s)': time_in_seconds, 'Memory Usage (MiB)': train_mem_usage })
+    memory_log.to_csv('memory_usage_log.csv', index=False)
+    plt.figure(figsize=(10, 6))
+    plt.plot(memory_log['Time (s)'], memory_log['Memory Usage (MiB)'], label='Memory Usage')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Memory Usage (MiB)')
+    plt.title('Memory Usage Over Time During Training')
+    plt.legend()
+    plt.savefig('memory_usage_log.png')
 
 
 if __name__ == '__main__':

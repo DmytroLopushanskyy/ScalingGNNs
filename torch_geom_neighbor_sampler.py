@@ -52,7 +52,9 @@ class NeighborSampler(BaseSampler):
         share_memory: bool = False,
         # Deprecated:
         directed: bool = True,
-    ):
+    ):  
+        self.feature_store = None  # Will be populated later if available
+
         if not directed:
             subgraph_type = SubgraphType.induced
             warnings.warn(f"The usage of the 'directed' argument in "
@@ -67,7 +69,8 @@ class NeighborSampler(BaseSampler):
                           f"accelerated neighborhood sampling")
 
         self.data_type = DataType.from_data(data)
-        self.neo4j_driver = GraphDatabase.driver('bolt://localhost:7687', auth=('neo4j', '12345678'))
+        self.neo4j_driver = GraphDatabase.driver('bolt://localhost:7687', auth=('neo4j', 'password'))
+        # self.neo4j_driver = GraphDatabase.driver('neo4j+s://f42e265a.databases.neo4j.io', auth=('neo4j', 'FxqbLYquc3-J7jVLX39FlOZcVRe-vf_8f4OBQDP85y8'))
 
         if self.data_type == DataType.homogeneous:
             self.num_nodes = data.num_nodes
@@ -167,6 +170,7 @@ class NeighborSampler(BaseSampler):
 
         else:  # self.data_type == DataType.remote
             feature_store, graph_store = data
+            self.feature_store = feature_store
 
             # Obtain graph metadata:
             attrs = [attr for attr in feature_store.get_all_tensor_attrs()]
@@ -264,9 +268,11 @@ class NeighborSampler(BaseSampler):
                 self.to_rel_type = {k: '__'.join(k) for k in self.edge_types}
                 self.to_edge_type = {v: k for k, v in self.to_rel_type.items()}
                 # Convert the graph data into CSC format for sampling:
-                row_dict, colptr_dict, self.perm = graph_store.csc()
-                self.row_dict = remap_keys(row_dict, self.to_rel_type)
-                self.colptr_dict =  remap_keys(colptr_dict, self.to_rel_type)
+                # row_dict, colptr_dict, self.perm = graph_store.csc()
+                # self.row_dict = remap_keys(row_dict, self.to_rel_type)
+                # self.colptr_dict =  remap_keys(colptr_dict, self.to_rel_type)
+                self.row_dict = None
+                self.colptr_dict =  None
 
         if (self.edge_time is not None
                 and not torch_geometric.typing.WITH_EDGE_TIME_NEIGHBOR_SAMPLE):
@@ -345,7 +351,8 @@ class NeighborSampler(BaseSampler):
 
     @property
     def edge_permutation(self) -> Union[OptTensor, Dict[EdgeType, OptTensor]]:
-        return self.perm
+        ### OVERRIDDEN!
+        return None # self.perm
 
     # Helper functions ########################################################
 
@@ -360,10 +367,6 @@ class NeighborSampler(BaseSampler):
         """
         if isinstance(seed, dict):  # Heterogeneous sampling:
             if True:
-                sys.path.append(os.path.join('/Users/dmytro/Documents/oxford/exams/thesis/ScalingGNNs'))
-                from cora_classification.src.graph_sampler import GraphSampler
-                sampler = GraphSampler()
-
                 dtype = torch.int64
                 seed = {k: v.to(dtype) for k, v in seed.items()}
 
@@ -389,7 +392,7 @@ class NeighborSampler(BaseSampler):
                     True  # return_edge_id
                 )
 
-                row, col, node, edge, num_sampled_nodes, num_sampled_edges = sampler.sample(*args)
+                row, col, node, edge, num_sampled_nodes, num_sampled_edges = self.feature_store.sampler.sample(*args)
                 batch = None
 
                 if self.disjoint:
@@ -498,11 +501,40 @@ class NeighborSampler(BaseSampler):
                 num_sampled_nodes=num_sampled_nodes,
                 num_sampled_edges=num_sampled_edges,
             )
-            # print("py3.9-pyg data", data)
+            # print("python3.9-pyg data", data)
             return data
         else:  # Homogeneous sampling:
+            if True:
+                args = (
+                    self.neo4j_driver,
+                    self.node_types,
+                    self.edge_types,
+                    {'PRODUCT': seed.to(torch.int64)},  # instead of seed.to(self.colptr.dtype)
+                    {'PRODUCT__LINK__PRODUCT': self.num_neighbors.get_mapped_values()},
+                    self.node_time,
+                )
+                if torch_geometric.typing.WITH_EDGE_TIME_NEIGHBOR_SAMPLE:
+                    args += (self.edge_time, )
+                args += (seed_time, )
+                if torch_geometric.typing.WITH_WEIGHTED_NEIGHBOR_SAMPLE:
+                    args += (self.edge_weight, )
+                args += (
+                    True,  # csc
+                    self.replace,
+                    self.subgraph_type != SubgraphType.induced,  # directed
+                    self.disjoint,
+                    self.temporal_strategy,
+                    True  # return_edge_id
+                )
+
+                row, col, node, edge, num_sampled_nodes, num_sampled_edges = self.feature_store.sampler.sample(*args)
+                batch = None
+
+                if self.disjoint:
+                    batch, node = node.t().contiguous()
+                
             # TODO Support induced subgraph sampling in `pyg-lib`.
-            if (torch_geometric.typing.WITH_PYG_LIB
+            elif (torch_geometric.typing.WITH_PYG_LIB
                     and self.subgraph_type != SubgraphType.induced):
 
                 args = (

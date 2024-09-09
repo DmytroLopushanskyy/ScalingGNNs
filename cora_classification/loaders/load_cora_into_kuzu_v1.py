@@ -17,24 +17,21 @@ ids_path = os.path.join(source_path, 'ids.npy')
 # Ensure the base directory exists
 if not os.path.exists(source_path):
     os.makedirs(source_path)
-#
-# node_features = np.load(node_features_path)
-# print(len(node_features))
-# cc = 0
-# for row in node_features:
-#     # print(row)
-#     lst = (row != 0).nonzero()[0].tolist()
-#     cc += len(lst)
-#     print(lst)
-# print(cc)
-# exit(1)
-# node_labels = np.load(node_labels_path)[:10]
-# ids = np.load(ids_path)[:100]
-# edge_index = pd.read_csv(edge_index_path).head(10)
 
-# print(x_preview)
-# print(y_preview, ids_preview)
-# print(edges_preview)
+node_features = np.load(node_features_path)
+
+cc = 0
+for row in node_features:
+    lst = (row != 0).nonzero()[0].tolist()
+    cc += len(lst)
+
+node_labels = np.load(node_labels_path)[:10]
+ids = np.load(ids_path)[:100]
+edge_index = pd.read_csv(edge_index_path).head(10)
+
+print(x_preview)
+print(y_preview, ids_preview)
+print(edges_preview)
 
 # Load dataset
 cora = Planetoid(root=base_path, name='Cora')[0]
