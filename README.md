@@ -10,6 +10,13 @@ Each project in this repository tackles a specific dataset with its own implemen
 - Custom environment setup for each project.
 - Training and evaluation scripts for the specific dataset.
 
+Additionally, there is a folder called **neo4j_remote_backend**, which contains our key abstractions like:
+- **Custom GraphStore**
+- **Custom FeatureStore**
+- **Neo4j Client**
+
+These abstractions are reused in the specific implementations of the projects.
+
 ### **Environment Setup**
 
 To set up the environment for running the various projects, use the following steps:
@@ -23,7 +30,7 @@ conda install pytorch==2.3.0 torchvision torchaudio cpuonly -c pytorch
 conda install -c conda-forge cmake
 conda install -c conda-forge gcc=9 gxx=9
 ```
-3. Install `pyg-lib` for efficient sampling:
+3. Install `pyg-lib` for in-memory alternative sampling:
 ```bash
 pip install git+https://github.com/pyg-team/pyg-lib.git@0.4.0
 ```
@@ -34,4 +41,4 @@ For the Neo4j backend, you need to replace the default `neighbor_sampler.py` in 
 ```bash
 /home/anonym/miniconda3/envs/CONDA_ENV_NAME/lib/python3.9/site-packages/torch_geometric/sampler/neighbor_sampler.py
 ```
-Use the custom sampler ```torch_geom_neighbor_sampler.py``` provided in the repository for optimal sampling performance during training.
+Use the custom sampler ```torch_geom_neighbor_sampler.py``` provided in the repository for optimal sampling performance during training. Additionally, it contains Neo4j access configuration, which needs to be adapted to the installation (if default is not used).

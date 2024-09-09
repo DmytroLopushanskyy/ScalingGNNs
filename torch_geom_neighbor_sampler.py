@@ -70,8 +70,7 @@ class NeighborSampler(BaseSampler):
 
         self.data_type = DataType.from_data(data)
         self.neo4j_driver = GraphDatabase.driver('bolt://localhost:7687', auth=('neo4j', 'password'))
-        # self.neo4j_driver = GraphDatabase.driver('neo4j+s://f42e265a.databases.neo4j.io', auth=('neo4j', 'FxqbLYquc3-J7jVLX39FlOZcVRe-vf_8f4OBQDP85y8'))
-
+    
         if self.data_type == DataType.homogeneous:
             self.num_nodes = data.num_nodes
 
@@ -457,17 +456,6 @@ class NeighborSampler(BaseSampler):
                                          "'torch-sparse'. Please install "
                                          "'pyg-lib' for improved and "
                                          "optimized sampling routines.")
-                # seed['Paper'] = seed.pop('paper')
-                # print(seed)
-                # print(self.node_types,
-                #     self.edge_types,
-                #     self.colptr_dict,
-                #     self.row_dict,
-                #     seed,  # seed_dict
-                #     self.num_neighbors.get_mapped_values(self.edge_types),
-                #     self.num_neighbors.num_hops,
-                #     self.replace,
-                #     self.subgraph_type != SubgraphType.induced,)
                 out = torch.ops.torch_sparse.hetero_neighbor_sample(
                     self.node_types,
                     self.edge_types,

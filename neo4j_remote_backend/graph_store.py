@@ -31,5 +31,6 @@ class Neo4jGraphStore(GraphStore):
     
     def get_all_edge_attrs(self) -> list[EdgeAttr]:
         """Returns all registered edge attributes."""
+        # return [EdgeAttr(edge_type=('PRODUCT', 'LINK', 'PRODUCT'), layout=EdgeLayout('coo'), is_sorted=True, size=(61859140, 61859140))]
         # [EdgeAttr(edge_type=('Paper', 'CITES', 'Paper'), layout=EdgeLayout('coo'), is_sorted=True, size=(111059956, 111059956))]
         return self.client.get_edge_groups_and_attributes()
